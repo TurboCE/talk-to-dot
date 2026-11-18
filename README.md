@@ -69,9 +69,10 @@ Requires JDK 17, Python 3 and Android SDK `platforms;android-36`, `build-tools;3
 ```sh
 export JAVA_HOME=/path/to/jdk17
 export ANDROID_SDK_ROOT=/path/to/android-sdk
-./scripts/test.sh
-./scripts/build.sh
+./scripts/build.sh  # runs the non-device regression/privacy suite before packaging
 ```
+
+Run `./scripts/test.sh` separately when you only need the non-device tests.
 
 Outputs: `dist/talk-to-dot.apk` and `dist/SHA256SUMS.txt`. Default builds create/reuse `build/debug.keystore` (standard development credentials, not a production identity). Keep this local key if you want future development builds to update this APK. Keys are ignored by Git and never uploaded. A different key requires uninstall/reinstall. `RELEASE_BUILD=true` requires explicit `KEYSTORE_PATH`, `KEYSTORE_PASSWORD`, optionally `KEY_PASSWORD` and `KEY_ALIAS` (default `local`). Do not use the upstream release-signing secrets; this fork has its own identity.
 
