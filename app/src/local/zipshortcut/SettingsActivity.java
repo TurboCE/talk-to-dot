@@ -9,105 +9,73 @@ public class SettingsActivity extends Activity {
     EditText name,entry;
     EditText[] fields=new EditText[CallSettings.KEYS.length];
     CheckBox consent,bixby;
-    TextView inspection,lastResult,serviceWarning;
+    TextView lastResult,serviceWarning;
+    final android.os.Handler ui=new android.os.Handler(android.os.Looper.getMainLooper());
+    final Runnable updateStatus=new Runnable(){public void run(){refreshStatus();ui.postDelayed(this,500);}};
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
-        ScrollView scroll=new ScrollView(this); scroll.setFitsSystemWindows(true);
-        LinearLayout box=new LinearLayout(this); box.setOrientation(1);
-        int pad=(int)(24*getResources().getDisplayMetrics().density); box.setPadding(pad,pad,pad,pad);
-        TextView title=new TextView(this); title.setText(R.string.configure_dot); title.setTextSize(26); box.addView(title);
-        button(box,R.string.apply_fold_profile,()-> {
-            if(!CallSettings.applyObservedFoldProfile(this)) {Toast.makeText(this,R.string.invalid,Toast.LENGTH_LONG).show();return;}
+        ScrollView scroll=new ScrollView(this);scroll.setFitsSystemWindows(true);
+        LinearLayout box=new LinearLayout(this);box.setOrientation(1);
+        int pad=(int)(24*getResources().getDisplayMetrics().density);box.setPadding(pad,pad,pad,pad);
+        TextView title=new TextView(this);title.setText(R.string.app_name);title.setTextSize(26);box.addView(title);
+        TextView help=new TextView(this);help.setText(R.string.setup_help);box.addView(help);
+        serviceWarning=new TextView(this);serviceWarning.setText(R.string.service_unavailable);box.addView(serviceWarning);
+        lastResult=new TextView(this);box.addView(lastResult);
+
+        LinearLayout advanced=new LinearLayout(this);advanced.setOrientation(1);advanced.setVisibility(android.view.View.GONE);
+        button(box,R.string.advanced_settings,()->advanced.setVisibility(advanced.getVisibility()==android.view.View.GONE?android.view.View.VISIBLE:android.view.View.GONE));
+        box.addView(advanced);
+        name=field(advanced,R.string.dot_name,DotSettings.name(this));name.setId(99);
+        entry=field(advanced,R.string.dot_entry,getSharedPreferences("shortcut",0).getString("dotEntry",""));entry.setId(106);
+        int[] titles={R.string.composer,R.string.menu_label,R.string.sidebar_label,R.string.up_label,R.string.call_label,R.string.connected_label};
+        for(int i=0;i<fields.length;i++){fields[i]=field(advanced,titles[i],CallSettings.get(this,i));fields[i].setId(100+i);}
+        bixby=new CheckBox(this);bixby.setId(202);bixby.setText(R.string.dismiss_bixby);
+        bixby.setChecked(getSharedPreferences("shortcut",0).getBoolean("dismissBixby",false));advanced.addView(bixby);
+        button(advanced,R.string.apply_fold_profile,()-> {
+            if(!CallSettings.applyObservedFoldProfile(this)){Toast.makeText(this,R.string.invalid,Toast.LENGTH_LONG).show();return;}
             if(ZipService.instance!=null && ZipService.instance.running)ZipService.instance.stop(ResultStatus.CANCELLED);
             name.setText("dot");entry.setText("Dot");
             for(int i=0;i<fields.length;i++)fields[i].setText(CallSettings.OBSERVED_FOLD_LABELS[i]);
             bixby.setChecked(true);consent.setChecked(false);Toast.makeText(this,R.string.saved_disabled,Toast.LENGTH_LONG).show();
         });
-        TextView help=new TextView(this); help.setText(R.string.setup_help); box.addView(help);
-        serviceWarning=new TextView(this);serviceWarning.setText(R.string.service_unavailable);box.addView(serviceWarning);
-        lastResult=new TextView(this);box.addView(lastResult);
-        inspection=new TextView(this);inspection.setContentDescription(getString(R.string.inspect_report));
-        inspection.setTextIsSelectable(true);
-        LinearLayout advanced=new LinearLayout(this);advanced.setOrientation(1);
-        advanced.setVisibility(android.view.View.GONE);
-        button(box,R.string.advanced_settings,()->advanced.setVisibility(advanced.getVisibility()==android.view.View.GONE?android.view.View.VISIBLE:android.view.View.GONE));
-        box.addView(advanced);advanced.addView(inspection);
-        name=field(advanced,R.string.dot_name,DotSettings.name(this)); name.setId(99);
-        entry=field(advanced,R.string.dot_entry,getSharedPreferences("shortcut",0).getString("dotEntry",""));entry.setId(106);
-        int[] titles={R.string.composer,R.string.menu_label,R.string.sidebar_label,R.string.up_label,R.string.call_label,R.string.connected_label};
-        for(int i=0;i<fields.length;i++) { fields[i]=field(advanced,titles[i],CallSettings.get(this,i)); fields[i].setId(100+i); }
-        bixby=new CheckBox(this);bixby.setId(202);bixby.setText(R.string.dismiss_bixby);
-        bixby.setChecked(getSharedPreferences("shortcut",0).getBoolean("dismissBixby",false));advanced.addView(bixby);
-        consent=new CheckBox(this); consent.setId(200); consent.setText(R.string.consent);
-        consent.setChecked(getSharedPreferences("shortcut",0).getBoolean("consent",false)); box.addView(consent);
+        consent=new CheckBox(this);consent.setId(200);consent.setText(R.string.consent);
+        consent.setChecked(getSharedPreferences("shortcut",0).getBoolean("consent",false));box.addView(consent);
         button(box,R.string.save,()->save());
-        button(box,R.string.save_open,()-> {if(save() && consent.isChecked()) { startActivity(new Intent(this,LauncherActivity.class)); finish(); }});
-        button(advanced,R.string.inspect_controls,()-> {
-            if(ZipService.instance==null) {Toast.makeText(this,R.string.inspect_enable,Toast.LENGTH_LONG).show();return;}
-            Intent chat=getPackageManager().getLaunchIntentForPackage("com.openai.chatgpt");
-            if(chat==null) {Toast.makeText(this,R.string.missing_app,Toast.LENGTH_LONG).show();return;}
-            ZipService.instance.inspectOnce();startActivity(chat);
-        });
-        button(advanced,R.string.inspect_menu,()-> {
-            if(ZipService.instance==null) {Toast.makeText(this,R.string.inspect_enable,Toast.LENGTH_LONG).show();return;}
-            Intent chat=getPackageManager().getLaunchIntentForPackage("com.openai.chatgpt");
-            if(chat==null) {Toast.makeText(this,R.string.missing_app,Toast.LENGTH_LONG).show();return;}
-            ZipService.instance.inspectMenuOnce(entry.getText().toString().trim().isEmpty()?name.getText().toString():entry.getText().toString());startActivity(chat);
-        });
-        button(advanced,R.string.inspect_entry,()-> {
-            if(ZipService.instance==null) {Toast.makeText(this,R.string.inspect_enable,Toast.LENGTH_LONG).show();return;}
-            Intent chat=getPackageManager().getLaunchIntentForPackage("com.openai.chatgpt");
-            if(chat==null) {Toast.makeText(this,R.string.missing_app,Toast.LENGTH_LONG).show();return;}
-            ZipService.instance.inspectEntryOnce();startActivity(chat);
-        });
-        button(advanced,R.string.inspect_bixby,()-> {
-            if(ZipService.instance==null) {Toast.makeText(this,R.string.inspect_enable,Toast.LENGTH_LONG).show();return;}
-            Intent assistant=getPackageManager().getLaunchIntentForPackage(BixbyHandoff.PACKAGE);
-            if(assistant==null) {Toast.makeText(this,R.string.missing_bixby,Toast.LENGTH_LONG).show();return;}
-            ZipService.instance.inspectBixbyOnce();startActivity(assistant);
-        });
         button(box,R.string.access,()->startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)));
-        button(box,R.string.cancel,()-> { if(ZipService.instance!=null)ZipService.instance.stop(ResultStatus.CANCELLED);
-            else CallSettings.cancelRequest(this); refreshStatus(); });
-        scroll.addView(box); setContentView(scroll);
+        button(box,R.string.cancel,()-> {
+            if(ZipService.instance!=null)ZipService.instance.stop(ResultStatus.CANCELLED);
+            else CallSettings.cancelRequest(this);
+            refreshStatus();
+        });
+        scroll.addView(box);setContentView(scroll);
     }
-    @Override protected void onResume() {
-        super.onResume();
-        refreshStatus();
-        if(inspection!=null) {
-            inspection.setText(ZipService.inspectionReport);
-            inspection.setVisibility(ZipService.inspectionReport.isEmpty()?android.view.View.GONE:android.view.View.VISIBLE);
-            if(!ZipService.inspectionReport.isEmpty() && inspection.isShown())inspection.post(()-> {
-                inspection.setFocusableInTouchMode(true);inspection.requestFocus();
-                inspection.requestRectangleOnScreen(new android.graphics.Rect(0,0,inspection.getWidth(),inspection.getHeight()),false);
-            });
-        }
-    }
-    void refreshStatus() {
+    @Override protected void onResume(){super.onResume();ui.removeCallbacks(updateStatus);updateStatus.run();}
+    @Override protected void onPause(){ui.removeCallbacks(updateStatus);super.onPause();}
+    void refreshStatus(){
         if(serviceWarning!=null)serviceWarning.setVisibility(ZipService.instance==null?android.view.View.VISIBLE:android.view.View.GONE);
-        if(lastResult!=null) {
+        if(lastResult!=null){
             int status=ResultStatus.message(getSharedPreferences("shortcut",0).getString("lastResult",""));
             lastResult.setText(status==0?"":getString(R.string.last_result)+" "+getString(status));
             lastResult.setVisibility(status==0?android.view.View.GONE:android.view.View.VISIBLE);
         }
     }
-    EditText field(LinearLayout box,int label,String value) {
-        TextView title=new TextView(this); title.setText(label); box.addView(title);
-        EditText edit=new EditText(this); edit.setSingleLine(true); edit.setImeOptions(android.view.inputmethod.EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING); edit.setContentDescription(getString(label)); edit.setText(value); box.addView(edit); return edit;
+    EditText field(LinearLayout box,int label,String value){
+        TextView title=new TextView(this);title.setText(label);box.addView(title);
+        EditText edit=new EditText(this);edit.setSingleLine(true);edit.setImeOptions(android.view.inputmethod.EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING);edit.setContentDescription(getString(label));edit.setText(value);box.addView(edit);return edit;
     }
-    void button(LinearLayout box,int title,Runnable action) { Button b=new Button(this); b.setText(title); b.setOnClickListener(v->action.run()); box.addView(b); }
-    boolean save() {
-        String[] values=new String[fields.length]; for(int i=0;i<fields.length;i++)values[i]=fields[i].getText().toString().trim();
-        if(!CallSettings.store(this,name.getText().toString(),values,consent.isChecked(),entry.getText().toString())) {
-            Toast.makeText(this,R.string.invalid,Toast.LENGTH_LONG).show(); return false;
+    void button(LinearLayout box,int title,Runnable action){Button b=new Button(this);b.setText(title);b.setOnClickListener(v->action.run());box.addView(b);}
+    boolean save(){
+        String[] values=new String[fields.length];for(int i=0;i<fields.length;i++)values[i]=fields[i].getText().toString().trim();
+        if(!CallSettings.store(this,name.getText().toString(),values,consent.isChecked(),entry.getText().toString())){
+            Toast.makeText(this,R.string.invalid,Toast.LENGTH_LONG).show();return false;
         }
-        if(!getSharedPreferences("shortcut",0).edit().putBoolean("dismissBixby",bixby.isChecked()).commit()) {
+        if(!getSharedPreferences("shortcut",0).edit().putBoolean("dismissBixby",bixby.isChecked()).commit()){
             Toast.makeText(this,R.string.invalid,Toast.LENGTH_LONG).show();return false;
         }
         if(ZipService.instance!=null && ZipService.instance.running)ZipService.instance.stop(ResultStatus.CANCELLED);
-        if(!consent.isChecked()) {
-            Toast.makeText(this,CallSettings.complete(values,name.getText().toString(),entry.getText().toString())?R.string.saved_disabled:R.string.consent_revoked,Toast.LENGTH_LONG).show(); return true;
+        if(!consent.isChecked()){
+            Toast.makeText(this,CallSettings.complete(values,name.getText().toString(),entry.getText().toString())?R.string.saved_disabled:R.string.consent_revoked,Toast.LENGTH_LONG).show();return true;
         }
-        Toast.makeText(this,R.string.saved,Toast.LENGTH_SHORT).show(); return true;
+        Toast.makeText(this,R.string.saved,Toast.LENGTH_SHORT).show();return true;
     }
 }

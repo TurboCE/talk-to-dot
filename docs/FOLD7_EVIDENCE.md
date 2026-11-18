@@ -87,3 +87,9 @@ User Bixby invocation appeared in Routines → utility → provider activity rec
 Only the created routine was renamed **닷 음성 실행**; its sole app-open action/manual trigger remained unchanged. A temporary UiAutomator jar performed ACTION_SET_TEXT on the exact routine-name EditText and verified the value, allowing Korean input without installing/changing keyboards. The jar was removed; no routine Start was selected.
 
 Retained-signature code17 installed successfully. Applying the observed profile kept calls OFF and enabled optional Bixby handoff. Explicit Bixby-only probes with calls OFF produced: keyboard-open timeout after one Back; then keyboard-hidden return to setup with **Bixby-only; Back attempts=1; Bixby no longer active; no call dispatch**. Provider microphone use remained unchanged. These isolated dismissal checks do not establish a spoken-command or live-call pass.
+
+## Owner acceptance and compact setup (code18)
+
+The owner reported Bixby invocation works after the code17 preparation. This is owner-reported acceptance; it is not independent verification of all layouts, cold startup or safety cases.
+
+Code18 is a UI cleanup: removed four diagnostic buttons/report and the immediate-call button, moved the observed-profile reset under advanced target settings, shortened both locale disclosures, and kept permission recovery, call authorization/revocation, last result, Save and cancellation. Core service/call/handoff logic and launcher component identities are unchanged. No new live call was requested for this update.
