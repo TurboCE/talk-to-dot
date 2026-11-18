@@ -1,0 +1,25 @@
+# Release readiness — Voice to Dots
+
+Current source: 1.4.1-dev, versionCode 8. This is still an independent MIT fork of Talk to Dot. The published 1.4.0 prerelease predates safety review fixes and must not be presented as the fixed build.
+
+## Completed
+
+- Fixes for refreshed control identity/label, process/reconnect cancellation, missing-tree grace, resolved-label collisions, authorization revocation, structural state evidence, stable persisted outcomes and ambiguous duplicate state controls.
+- 27 policy assertions, 31 baseline service assertions and 104 review regression assertions pass; manifest permission/backup/scope and locale parity checks pass.
+- Complete app compilation and signed APK build on the designated MacBook with JDK 17 / Android 36 / build tools 36.1.0. Zip alignment and APK v2/v3 signature verified. Current build is development signed.
+- No phone data erased, package removed, Accessibility service enabled or unrelated Android device operated on.
+
+## Required device evidence before stable release
+
+1. Connect the actual Fold7 to this MacBook with a data-capable USB cable, unlock it, enable USB debugging and accept its computer authorization prompt. These are owner actions. ADB must show the Fold7 as `device`, not `unauthorized`, `offline`, or `recovery`. Any other attached phone must be excluded by explicit serial selection for every device command.
+2. Inspect installed package and signing certificate first. The current package is `local.zipshortcut`. If an upstream installation has a different certificate, do not uninstall or clear its data automatically. Preserve it; decide with the owner whether a separate application identity or another migration is appropriate.
+3. Inspect the installed ChatGPT version and owner-visible accessibility controls without publishing raw UI trees or conversations. Verify exact input/menu/sidebar/call/end-call labels, role, clickability and window structure for Korean and English where available. Do not infer labels from screenshots or assume that an icon is accessible.
+4. Install only on the identified Fold7 after compatibility checks. Owner manually enables this app's Accessibility service and completes ChatGPT permissions/onboarding. No automated device setting changes.
+5. With the owner present, verify correct Dot selection, exactly one real call start, actual call screen, audible conversation and manual call end. The utility itself never ends calls. Record folded/unfolded results and actual app/OS versions.
+6. Verify wrong/missing/duplicate labels, repeated launches, already-on-call, lost/stale trees, app switching, lock, interrupted/recreated service, revocation and timeout without unwanted calls or resumed requests. Synthetic tests do not replace these device acceptance tests.
+7. Configure and verify the specific Bixby/Routines launch-app action actually available on this device. Verify again while unlocked in both Fold layouts. Do not promise background unlock or unsupported Samsung actions.
+8. Before stable distribution, select and retain the release signing identity and backup, ensure future updates use it, finalize package/version and disclosures, rerun full checks, and publish only results supported by the physical tests. Existing upstream-signing compatibility is not claimed. GitHub Actions currently has no confirmed run and must not be reported as passed.
+
+## Current gate
+
+The latest ADB inventory from the designated MacBook shows only the unrelated dream2lte / Galaxy S8-family device in recovery, not a Fold7. No commands were sent to it beyond the global device inventory. Fold7 connection and its owner-approved USB-debugging prompt are the next required human action. No stable release is possible until the actual target becomes available and the acceptance criteria pass.

@@ -1,6 +1,6 @@
 # Local review fixes — 1.4.1-dev
 
-These changes are local only. The published `call-preview-1.4.0` / `8ecac1a` does not contain them. No phone installation, device settings, GitHub push or release publication was performed for this correction pass.
+The published `call-preview-1.4.0` / `8ecac1a` does not contain these source corrections. The corrected source can be published for review while physical-device validation is pending; no replacement or stable APK release is approved by synthetic checks alone. No phone installation or settings change was performed during the correction pass.
 
 | Reviewed problem | Correction | Regression evidence |
 | --- | --- | --- |

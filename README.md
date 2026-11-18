@@ -1,6 +1,6 @@
 # Talk to Dot — TurboCE call preview
 
-**Local working build: 1.4.1-dev (not published).** The downloadable 1.4.0 preview does not contain the [review fixes](docs/REVIEW_FIXES.md).
+**Development source: 1.4.1-dev; replacement APK not released.** The downloadable 1.4.0 preview does not contain the [review fixes](docs/REVIEW_FIXES.md).
 
 MIT fork of [looizao/talk-to-dot](https://github.com/looizao/talk-to-dot), based on `6fbb5a3bde2fc2ee6a16b0a01a3138210c7b3c4c`. The original [MIT notice](LICENSE) and character artwork remain. Independent project; not affiliated with OpenAI.
 
