@@ -73,3 +73,9 @@ The agent selected **Voice to Dot 시작** exactly once in Samsung Routines, wit
 A subsequent no-click service probe recognized a non-Dot work input and the actionable **상위 화면으로 이동** control. No work title/input identifier is included in public evidence. The observed optional Up setting was blank. A single structurally checked ADB action on that Up control returned to a screen with one **메뉴** control; it did not start a call. The 1.4.9-dev observed preset now includes the exact Korean Up label; synthetic regression checks pass. No further live call was attempted.
 
 The retained-signature 1.4.9-dev / code16 update subsequently installed successfully. Applying its observed preset cleared pending requests and saved call authorization OFF. The Up edit field was verified as **상위 화면으로 이동**, then advanced setup was collapsed. The service remained actually bound after this update and the floating shortcut was still absent. [Runtime CI 44358608124](https://github.com/TurboCE/talk-to-dot/actions/runs/44358608124) passed. The corrected full-flow live test has not run.
+
+## Corrected saved-routine trial (single announced start)
+
+With installed code16, actual service binding and a pretrial cancelled outcome were verified. The utility's own authorization was saved ON; then **Voice to Dot 시작** was selected exactly once in Samsung Routines. No direct utility-launch or ChatGPT phone-button ADB action was used.
+
+At about 19 seconds and again after 35 seconds, ChatGPT's microphone app-op showed a new running session. After the complete attempt deadline, the utility's saved result was **configured call screen detected**. This is successful routine-to-app call-screen initiation evidence; audible response remains owner-confirmed only. After reading the result, the agent returned to the existing ChatGPT call screen without clicking a phone control or starting another session. Owner feedback/termination is pending at the time of this record.
