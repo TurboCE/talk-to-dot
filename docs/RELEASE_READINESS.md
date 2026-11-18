@@ -31,6 +31,6 @@ Current candidate: **1.4.11-dev / versionCode 18**. The owner reported that the 
 
 ## Publication
 
-Work is on `fix/review-safety`, draft [PR #1](https://github.com/TurboCE/talk-to-dot/pull/1) targets `main`. The default `main` was still `8ecac1ae4a9497bc3b16d8ea61a6a6b4379cc322` when checked before this cleanup. The prior published `call-preview-1.4.0` predates the fixes. A new development-preview asset is being prepared; do not treat a plan as a successful publication. No stable release has been published.
+Work is on `fix/review-safety`, draft [PR #1](https://github.com/TurboCE/talk-to-dot/pull/1) targets `main`. The default `main` was still `8ecac1ae4a9497bc3b16d8ea61a6a6b4379cc322` when checked before this cleanup. The prior published `call-preview-1.4.0` predates the fixes. The [call-preview-1.4.11 development preview](https://github.com/TurboCE/talk-to-dot/releases/tag/call-preview-1.4.11) is published from runtime commit `26ddb395cd4f0529d1a8a10d2e11252a0ce416b9`. Source [CI 44366689368](https://github.com/TurboCE/talk-to-dot/actions/runs/44366689368) passed. Uploaded, installed and local APK SHA256 all match `1f67128baa72e9662581ea51f7aa14c12d71c0cb374c22e6f1dcbb2b4908c514`. The GitHub release is explicitly prerelease, not draft. Main remains unmerged. No stable release has been published.
 
 [FOLD7_EVIDENCE.md](FOLD7_EVIDENCE.md) retains the bounded historical observations. Private serials, pairing codes, connection endpoints and raw conversation dumps are excluded.
