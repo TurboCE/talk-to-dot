@@ -1,52 +1,35 @@
 package local.zipshortcut;
-
 import android.app.Activity;
+import android.app.KeyguardManager;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.provider.Settings;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
-    @Override public void onCreate(Bundle b) {
-        super.onCreate(b);
-        if (isEnabled()) { openDot(); return; }
-        LinearLayout layout = new LinearLayout(this);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setPadding(56, 80, 56, 40);
-        TextView title = new TextView(this); title.setText("Talk to Dot"); title.setTextSize(28);
-        layout.addView(title);
-        TextView info = new TextView(this);
-        info.setText("This shortcut opens ChatGPT, opens its menu, and selects your saved Dot (zip by default).\n\nAndroid Accessibility access is required to tap those controls. Android grants broad screen access; this app is configured for ChatGPT and acts only for 30 seconds after you launch it.\n\nIt does not send messages, place calls, store chat content, or connect to the internet.\n\nEnable Talk to Dot in Accessibility, then tap its app icon again. If Android blocks the switch, open Talk to Dot’s App info menu and allow restricted settings for this locally built app.");
-        info.setTextSize(17); info.setPadding(0,32,0,32); layout.addView(info);
-        Button choose = new Button(this); choose.setText("Choose Dot");
-        choose.setOnClickListener(v -> startActivity(new Intent(this, SettingsActivity.class)));
-        layout.addView(choose);
-        Button settings = new Button(this); settings.setText("Open Accessibility settings");
-        settings.setOnClickListener(v -> startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)));
-        layout.addView(settings);
-        Button plain = new Button(this); plain.setText("Open ChatGPT without automation");
-        plain.setOnClickListener(v -> { Intent i = getPackageManager().getLaunchIntentForPackage("com.openai.chatgpt"); if (i != null) startActivity(i); });
-        layout.addView(plain); setContentView(layout);
-    }
-    private boolean isEnabled() {
-        String enabled=Settings.Secure.getString(getContentResolver(),Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
-        String service=new ComponentName(this,ZipService.class).flattenToString();
-        return enabled!=null && enabled.contains(service);
-    }
-    @Override protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent); setIntent(intent);
-        if (isEnabled()) openDot();
-    }
+    @Override public void onCreate(Bundle state) { super.onCreate(state); openDot(); }
+    @Override protected void onNewIntent(Intent intent) { super.onNewIntent(intent); setIntent(intent); openDot(); }
     private void openDot() {
-        Intent i = getPackageManager().getLaunchIntentForPackage("com.openai.chatgpt");
-        if (i == null) return;
-        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        getSharedPreferences("shortcut",0).edit().putLong("armedUntil",System.currentTimeMillis()+30000)
-                .putLong("startedAtElapsed",android.os.SystemClock.elapsedRealtime()).apply();
-        if (ZipService.instance != null) ZipService.instance.begin();
-        startActivity(i); finish();
+        String enabled=Settings.Secure.getString(getContentResolver(),Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+        ComponentName service=new ComponentName(this,ZipService.class);
+        boolean access=false;
+        if(enabled!=null)for(String s:enabled.split(":"))if(service.equals(ComponentName.unflattenFromString(s)))access=true;
+        if(!access || !CallSettings.configured(this)) {
+            startActivity(new Intent(this,SettingsActivity.class)); finish(); return;
+        }
+        KeyguardManager lock=(KeyguardManager)getSystemService(KEYGUARD_SERVICE);
+        if(lock!=null && lock.isKeyguardLocked()) { Toast.makeText(this,R.string.locked,Toast.LENGTH_LONG).show(); finish(); return; }
+        Intent launch=getPackageManager().getLaunchIntentForPackage("com.openai.chatgpt");
+        if(launch==null) { Toast.makeText(this,R.string.missing_app,Toast.LENGTH_LONG).show(); finish(); return; }
+        android.content.SharedPreferences prefs=getSharedPreferences("shortcut",0);
+        long now=SystemClock.elapsedRealtime(), previous=prefs.getLong("lastLaunch",-1);
+        if(prefs.getInt("boot",-2)==Settings.Global.getInt(getContentResolver(),Settings.Global.BOOT_COUNT,-1) && previous>=0 && now>=previous && now-previous<CallPolicy.TOTAL_MS) { finish(); return; }
+        if(!prefs.edit().putLong("startedAtElapsed",now).putLong("lastLaunch",now).putInt("boot",Settings.Global.getInt(getContentResolver(),Settings.Global.BOOT_COUNT,-1)).putBoolean("callAttempted",false).remove("attemptedAt").commit()) { finish(); return; }
+        launch.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        try { startActivity(launch); if(ZipService.instance!=null)ZipService.instance.begin(); }
+        catch(RuntimeException error) { prefs.edit().remove("startedAtElapsed").apply(); Toast.makeText(this,R.string.missing_app,Toast.LENGTH_LONG).show(); }
+        finish();
     }
 }
