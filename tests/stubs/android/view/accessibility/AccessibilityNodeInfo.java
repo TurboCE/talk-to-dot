@@ -6,6 +6,7 @@ public class AccessibilityNodeInfo {
  public java.util.List<AccessibilityNodeInfo> children=new java.util.ArrayList<>();
  public AccessibilityNodeInfo(String label){this.label=label;}
  public AccessibilityNodeInfo add(AccessibilityNodeInfo n){children.add(n);n.parent=this;return this;}
+ public CharSequence getClassName(){return clickable?"android.widget.Button":"android.widget.TextView";}
  public CharSequence getText(){return label;} public CharSequence getContentDescription(){return null;}public CharSequence getHintText(){return null;}
  public CharSequence getPackageName(){return pkg;} public boolean refresh(){return true;}
  public boolean isVisibleToUser(){return visible;}public boolean isEnabled(){return enabled;}public boolean isClickable(){return clickable;}public boolean isEditable(){return editable;}
