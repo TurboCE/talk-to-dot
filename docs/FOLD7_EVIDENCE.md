@@ -57,3 +57,11 @@ The retained-signature 1.4.7-dev / code14 update installed successfully with no 
 An empty, unsaved Samsung Routines draft exposed: 루틴 만들기 → 이 루틴으로 실행할 동작 추가하기 → 애플리케이션 → 앱을 열거나 앱 동작 바로 실행. Searching Voice showed **Voice to Dot 열기**. The action was not selected or run; no routine was saved. This establishes availability, not successful Bixby voice-trigger execution.
 
 With authorization verified OFF, both the stable `LauncherActivity` and legacy `MainActivity` entry were invoked once. Each returned to own setup with authorization still OFF; the provider microphone app-op remained stopped with its prior completed duration unchanged. This verifies authorization-off routing on device. It does not test the authorized-launch cooldown, locked-device gate, cold provider startup, or interruption during a live attempt.
+
+## Service recovery and 1.4.8-dev (no call)
+
+The announced routine trial stopped before any routine Start action when preflight found no service connection despite the enabled setting. The available app crash buffer had no matching Java exception; Android update/process-termination logs were seen, without establishing the exact cause. The retained-signature code15 update installed successfully and preserved settings. Its disconnected-service warning was visible, and Cancel immediately replaced the old confirmed result with cancelled even without a connected service. Authorization was saved OFF.
+
+The owner explicitly asked the agent to perform the recovery. Only the utility's main service control was toggled off and on in Android Accessibility → Installed apps → Voice to Dot. Actual connection was then verified in the complete **multiline Bound services section**, not by the Enabled services list or a single-line match. The setup warning disappeared. The floating Accessibility Button assignment remained absent and authorization remained OFF. Last result showed cancelled. Provider microphone app-ops retained the old completed duration; no new call or routine Start occurred. Existing non-floating hardware shortcuts and other services were preserved.
+
+Runtime source 712da62 passed [CI 44356586143](https://github.com/TurboCE/talk-to-dot/actions/runs/44356586143); the local full suite passed 363 assertions and the APK v2/v3 signature checks. Samsung routine execution and audio feedback are still pending.
