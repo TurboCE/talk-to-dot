@@ -97,3 +97,13 @@ Code18 is a UI cleanup: removed four diagnostic buttons/report and the immediate
 The code18 update was confirmed after reconnecting: version18 was already installed, so it was not installed twice. Its installed base APK SHA256 matched the local candidate **1f67128baa72e9662581ea51f7aa14c12d71c0cb374c22e6f1dcbb2b4908c514**. Actual compact setup showed only Advanced settings, Save, Accessibility settings and cancellation, with no editable fields or diagnostic/immediate-call buttons visible. Authorization remained ON, the service remained bound and the floating shortcut remained absent. No new live call was started.
 
 [Source CI 44366689368](https://github.com/TurboCE/talk-to-dot/actions/runs/44366689368) passed at runtime commit **26ddb395cd4f0529d1a8a10d2e11252a0ce416b9**. The same APK, checksum and public signature metadata were published as [call-preview-1.4.11](https://github.com/TurboCE/talk-to-dot/releases/tag/call-preview-1.4.11). GitHub's uploaded APK digest matched the installed/local hash. This is a prerelease, not stable acceptance or a merge to main.
+
+## Follow-up non-call safety window and setup idleness (code19)
+
+The owner reconfirmed that an actual spoken Bixby command worked. This records owner-reported acceptance, not independent verification of every lifecycle/layout case.
+
+During preparation for additional non-call lifecycle tests, the host's own-settings selectors could not obtain a stable control. The setup updater was found to rewrite unchanged status text/visibility every 500ms; code19 skips those writes when values are unchanged. The full 443 synthetic checks, compilation and development-signature verification passed. The same-signature code19 update installed; an own-app semantic Advanced-button fixture then passed and exposed editable settings. No call policy or provider selector changed.
+
+The attempted guard setup later stopped before editing because Android's actual active root was SystemUI: keyguard showing=true, inputRestricted=true and wakefulness Dozing. No non-matching call label was applied or saved, no launcher/routine test was executed, and the temporary UI-test jar was removed. The original working call settings remain unchanged. This is **not** a completed repeat-launch, departure, process-restart or lock-refusal test. A fresh physical unlock is required before the prepared fixtures can run.
+
+The local rotation candidate was regenerated from code19 using the backup-restored keys and passed API26–32 and API33–37 signature verification. No production signer was installed or uploaded; current phone signing identity remains the retained development identity.

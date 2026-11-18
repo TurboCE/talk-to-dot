@@ -52,11 +52,16 @@ public class SettingsActivity extends Activity {
     @Override protected void onResume(){super.onResume();ui.removeCallbacks(updateStatus);updateStatus.run();}
     @Override protected void onPause(){ui.removeCallbacks(updateStatus);super.onPause();}
     void refreshStatus(){
-        if(serviceWarning!=null)serviceWarning.setVisibility(ZipService.instance==null?android.view.View.VISIBLE:android.view.View.GONE);
+        if(serviceWarning!=null){
+            int visibility=ZipService.instance==null?android.view.View.VISIBLE:android.view.View.GONE;
+            if(serviceWarning.getVisibility()!=visibility)serviceWarning.setVisibility(visibility);
+        }
         if(lastResult!=null){
             int status=ResultStatus.message(getSharedPreferences("shortcut",0).getString("lastResult",""));
-            lastResult.setText(status==0?"":getString(R.string.last_result)+" "+getString(status));
-            lastResult.setVisibility(status==0?android.view.View.GONE:android.view.View.VISIBLE);
+            String value=status==0?"":getString(R.string.last_result)+" "+getString(status);
+            if(!value.contentEquals(lastResult.getText()))lastResult.setText(value);
+            int visibility=status==0?android.view.View.GONE:android.view.View.VISIBLE;
+            if(lastResult.getVisibility()!=visibility)lastResult.setVisibility(visibility);
         }
     }
     EditText field(LinearLayout box,int label,String value){

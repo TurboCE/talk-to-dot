@@ -1,6 +1,6 @@
 # Release readiness — Voice to Dot
 
-Current candidate: **1.4.11-dev / versionCode 18**. The owner reported that the Korean Bixby invocation works with the preceding code17 runtime. Code18 simplifies setup; call/navigation/handoff policies are unchanged. This remains a development preview.
+Published preview: **1.4.11-dev / versionCode 18**. Current installed candidate: **1.4.12-dev / versionCode 19**, which skips redundant unchanged setup-status writes. The owner reported that the Korean Bixby invocation works with the preceding code17 runtime. Code18 simplifies setup; call/navigation/handoff policies are unchanged. This remains a development preview.
 
 ## Completed
 
@@ -40,3 +40,5 @@ Work is on `fix/review-safety`, draft [PR #1](https://github.com/TurboCE/talk-to
 A dedicated signing candidate, API26–37 signature verification and encrypted-key archive restoration/signing rehearsal are complete locally; see [SIGNING_PLAN.md](SIGNING_PLAN.md). Nothing changed the installed signer or published APK. Independent owner backup and a device rotation test are still pending.
 
 Non-call device lifecycle fixtures were prepared to use a non-matching call label as an additional safeguard. They were not applied or executed: the phone changed to another user app during setup, so the agent stopped and requested a short idle/unlocked window. The original call label, authorization and working settings remain unchanged. No new call was started.
+
+The owner reconfirmed actual spoken Bixby operation. Code19's 443 synthetic checks/build/signature verification passed and its own Advanced UI action passed after installation. The additional non-call lifecycle sequence did not run: guard setup aborted on the confirmed locked/Dozing SystemUI root before editing. Do not mark repeated-launch, departure, cold process or lock-refusal acceptance complete. A fresh unlock/short idle window is needed; no guard or new call was left active.

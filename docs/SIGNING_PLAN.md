@@ -8,7 +8,7 @@ A separate RSA3072 release key and proof-of-rotation candidate were prepared loc
 
 `326c91d8ef45720b9842eafcdc0f00d1e2317188b4797eb35f1d9d91b81a46ec`
 
-No device signer was changed. No private key, password, backup archive or rotation candidate APK was uploaded. The candidate retains the development version; it is not a published stable build.
+No device signer was changed. No private key, password, backup archive or rotation candidate APK was uploaded. The current local candidate was regenerated from code19 using backup-restored keys and retains the development version; it is not a published stable build.
 
 ## Verified locally
 
