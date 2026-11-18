@@ -47,3 +47,13 @@ The latest owner-provided pairing information was used only for the specified de
 The same-signature **1.4.6-dev / code 13** update succeeded without data clearing. Its only runtime change after the successful non-call probes refreshes the stable saved outcome whenever setup resumes. Device UI inspection again verified **8/8 prepared fields** and **call authorization OFF**. No live call was started in this preparation.
 
 Mandatory non-device regression gates now run for every APK build. The [latest runtime-source Linux CI](https://github.com/TurboCE/talk-to-dot/actions/runs/44347446027), revision `1e6a502`, succeeded, as did the prior service revision's run. Local macOS build/signature checks also pass. The current source remains a draft review branch; a real app-originated call, remaining device safety/layout/routine acceptance and release signing still gate stable publication.
+
+## Announced app-originated trial and simplified UI
+
+One selection of the utility’s Save-and-call action produced its stable configured-call-screen-confirmed result. No direct ADB ChatGPT phone-control click was used. The provider microphone app-op later showed about 47 seconds of completed use. Audio and who ended the call are not inferred from this record; owner feedback is pending. Automatic-call authorization was subsequently saved OFF without another launch.
+
+The retained-signature 1.4.7-dev / code14 update installed successfully with no uninstall or data reset. Actual setup rendering showed advanced edit fields and the icon chooser absent, authorization OFF, and the prior confirmed result. The app uses a neutral microphone icon and Voice to Dot label.
+
+An empty, unsaved Samsung Routines draft exposed: 루틴 만들기 → 이 루틴으로 실행할 동작 추가하기 → 애플리케이션 → 앱을 열거나 앱 동작 바로 실행. Searching Voice showed **Voice to Dot 열기**. The action was not selected or run; no routine was saved. This establishes availability, not successful Bixby voice-trigger execution.
+
+With authorization verified OFF, both the stable `LauncherActivity` and legacy `MainActivity` entry were invoked once. Each returned to own setup with authorization still OFF; the provider microphone app-op remained stopped with its prior completed duration unchanged. This verifies authorization-off routing on device. It does not test the authorized-launch cooldown, locked-device gate, cold provider startup, or interruption during a live attempt.
