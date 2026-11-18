@@ -1,43 +1,43 @@
-# Fold7 evidence — scope and current limits
+# Release readiness — Voice to Dots
 
-Observed on the designated MacBook with every device command explicitly selecting the Fold7. The unrelated dream2lte recovery device was not operated on. No raw conversation tree, message text, audio or screen recording is retained in this repository.
+Current source: 1.4.4-dev, versionCode 11 (built locally; the device last received 1.4.3-dev / code 10). This is still an independent MIT fork of Talk to Dot. The published 1.4.0 prerelease predates safety review fixes and must not be presented as the fixed build.
 
-## Observed / owner reported
+## Completed
 
-- Model: Samsung **SM-F966N**, ADB-authorized. Android **17**, SDK **37**. ChatGPT **1.2026.314** (versionCode 2631431).
-- `local.zipshortcut` was absent. Development APK **1.4.1-dev / code 8** installed successfully, and its Korean setup UI displayed. The same-signature **1.4.2-dev / code 9** then installed successfully with `adb install -r --no-incremental`, without clearing data; package inspection confirmed code 9. The service was disabled at that installation check; the owner subsequently enabled it manually, and a read-only enabled-service check returned true. No existing package was uninstalled and no data cleared.
-- The owner identified the target name as **dot** and opened that conversation.
-- Normal-screen descriptions observed: menu **메뉴**, call **통화**, composer label **내 dot에게 메시지 보내기**, assistant options **어시스턴트 옵션 열기**, dictation **받아쓰기**. These are device evidence, not general defaults or assumptions for another version/language.
-- Menu/call labels are nonclickable `android.view.View` descendants four levels below a clickable `android.view.View` owner. That owner has two immediate children: a noninteractive label branch and one nonclickable `android.widget.Button` role leaf.
-- The composer description is in a noninteractive View sibling of the `android.widget.EditText`, under their immediate two-child parent; the input itself had no exposed text/description.
-- One manually initiated ADB control tap opened the real ChatGPT call screen. The owner confirmed hearing audio. **Voice to Dot did not initiate this call:** its service was not enabled/configured. A later attempted inspection tap failed its target-header guard and did not execute a second call click.
-- The UI subsequently returned to the conversation. **통화 평가** was observed there; it is a post-call rating control and must not be mistaken for an active-call confirmation marker.
-- In a later explicitly pre-announced follow-up, exactly one direct ADB call-button tap opened the active call screen. Actual control descriptions were **오디오 출력 변경**, **종료**, **소리 끄기**, and **통화 최소화**. The composer marker was absent. Each control had a clickable View owner with direct children `[android.view.View, android.widget.Button]`; the bounded label-owner search found the owner without a guessed location.
-- The same follow-up was safely finished with exactly one direct ADB tap on **종료**, only after rechecking all four active-call labels, input absence, uniqueness and the paired role structure. The normal composer returned and the 종료 marker disappeared. No repeated call was started. This confirms the actual label and manual screen transition, **not an app-originated automated call**.
+- Fixes for refreshed control identity/label, process/reconnect cancellation, missing-tree grace, resolved-label collisions, authorization revocation, structural state evidence, stable persisted outcomes and ambiguous duplicate state controls.
+- 27 policy, 31 baseline service, 123 safety regression, 39 observed-layout/inspection and 33 menu-only assertions pass; manifest permission/backup/scope and locale parity checks pass.
+- Complete app compilation and signed APK build on the designated MacBook with JDK 17 / Android 36 / build tools 36.1.0. Zip alignment and APK v2/v3 signature verified. Current build is development signed.
+- No phone data erased, package removed, Accessibility service enabled or unrelated Android device operated on.
 
-## Actual service read-only diagnostic
+## Required device evidence before stable release
 
-After the owner enabled Accessibility, only the app's **CHATGPT 컨트롤 진단 (누르지 않음)** action was selected. The app opened ChatGPT and captured its in-memory diagnostic report without a ChatGPT control click or call attempt. On return to setup, the actual service report was:
+1. Connect the actual Fold7 to this MacBook with a data-capable USB cable, unlock it, enable USB debugging and accept its computer authorization prompt. These are owner actions. ADB must show the Fold7 as `device`, not `unauthorized`, `offline`, or `recovery`. Any other attached phone must be excluded by explicit serial selection for every device command.
+2. Inspect installed package and signing certificate first. The current package is `local.zipshortcut`. If an upstream installation has a different certificate, do not uninstall or clear its data automatically. Preserve it; decide with the owner whether a separate application identity or another migration is appropriate.
+3. Inspect the installed ChatGPT version and owner-visible accessibility controls without publishing raw UI trees or conversations. Verify exact input/menu/sidebar/call/end-call labels, role, clickability and window structure for Korean and English where available. Do not infer labels from screenshots or assume that an icon is accessible.
+4. Install only on the identified Fold7 after compatibility checks. Owner manually enables this app's Accessibility service and completes ChatGPT permissions/onboarding. No automated device setting changes.
+5. With the owner present, verify correct Dot selection, exactly one real call start, actual call screen, audible conversation and manual call end. The utility itself never ends calls. Record folded/unfolded results and actual app/OS versions.
+6. Verify wrong/missing/duplicate labels, repeated launches, already-on-call, lost/stale trees, app switching, lock, interrupted/recreated service, revocation and timeout without unwanted calls or resumed requests. Synthetic tests do not replace these device acceptance tests.
+7. Configure and verify the specific Bixby/Routines launch-app action actually available on this device. Verify again while unlocked in both Fold layouts. Do not promise background unlock or unsupported Samsung actions.
+8. Before stable distribution, select and retain the release signing identity and backup, ensure future updates use it, finalize package/version and disclosures, rerun full checks, and publish only results supported by the physical tests. Existing upstream-signing compatibility is not claimed. GitHub Actions currently has no confirmed run and must not be reported as passed.
 
-```text
-controls=2, inputLabels=1
-Button: 메뉴 | owner=android.view.View
-Button: 통화 | owner=android.view.View
-Input label: 내 dot에게 메시지 보내기
-```
+## Current gate
 
-This establishes that the constrained owner and paired-input resolver works for these normal-screen controls through the real AccessibilityService, not just UIAutomator or synthetic fixtures. It does not establish an active end-call marker, sidebar navigation, a configured/automated call or audio from an app-originated call. Call settings were not armed or saved during this diagnostic.
+The actual Fold7 is now identified as Samsung SM-F966N / Android 17 (API 37). It had no existing `local.zipshortcut`, and the 1.4.1-dev test APK installed without removing any app or data. A manually initiated ADB click opened ChatGPT's actual call screen; the owner reports audible Dot output. This was **not** a Voice to Dot automated call. The 1.4.2-dev source now supports the observed normal-screen Compose structure and includes read-only service diagnostics, but the updated 1.4.2-dev APK has installed successfully without data clearing, and its real AccessibilityService read-only diagnostic recognized the normal-screen menu/call owners and composer label after the owner enabled access. A later pre-announced single direct ADB test confirmed the active end-control label **종료**, its paired role structure, composer absence during the call, and normal-composer restoration after one verified end tap. Actual active-call detection through the service, sidebar markers, automated single-call flow, both Fold layouts, safety acceptance and Bixby/Routines remain gates. Next live call must be announced to the owner and coordinated before execution. See FOLD7_EVIDENCE.md.
 
-## Source work derived from evidence
+## Latest non-call preparation gate
 
-1.4.2-dev supports only the constrained paired label/Button ownership and paired input-label structure observed above. It retains unique-control and ambiguous-state cancellation, refresh/identity/bounds revalidation, one-attempt persistence and deadlines. No arbitrary ancestor or coordinate fallback is added to the app. Synthetic fixtures reproduce only control labels and structure, with no conversation content.
+No calls were made during the subsequent menu/setup preparation. A menu-only diagnostic build (1.4.3-dev) installed without clearing data. The actual native navigation screen exposes **Dot** (capital D), not the profile name **dot**. The row is a clickable View with three View children and one Button-role child; the Dot TextView is two levels beneath the owner. This differs from the two-child compact call/menu binding. The complete decorative/label branch structure still needs device inspection before accepting that row. The latest source separates the entry label from the profile name and does not silently loosen the selector.
 
-Read-only diagnostics can inspect the actual AccessibilityService view once the owner manually enables access. It performs no clicks, does not arm a call, excludes editable values and transcript text, and holds its report in process memory only. Structural behavior remains subject to actual service-tree validation.
+The menu probe was requested and a native MainActivity navigation screen was observed, but its temporary final attempt/result report could not be read from the scrolled setup UI. Do not count semantic menu execution as fully validated on that evidence alone. 1.4.4-dev improves report focus and unknown-ownership metadata for the next inspection.
 
-## Still required
+Fold7 then disappeared from both USB and mDNS inventory. Reconnection to the last confirmed endpoint `192.168.0.74:42319` was refused. Only the unrelated recovery device remains visible, and it was not operated on. Obtain the current **Wireless debugging IP address and connection port** (not the pairing-code port), then reconnect with the existing pairing identity if still authorized. No further live call is authorized without a new advance readiness announcement.
 
-- Owner manually enabled Talk to Dot Accessibility. The agent verified it read-only and never toggled the permission.
-- Confirmed sidebar/Dot selection structure, active-call detection through the service, automated app-originated call, manual audio confirmation of that flow, negative/safety cases and Bixby/Routines.
-- Folded/unfolded device state has not been independently established; display dimensions alone are not claimed as proof.
-- Before another live call, announce the intended test to the owner through the coordinating task and wait for readiness. Do not unexpectedly trigger another call.
-- No stable release or verified end-to-end claim until these gates pass.
+## Later menu preparation (no live call)
+
+- 1.4.3-dev / code 10 installed as a same-signature update, with no uninstall or data clear. The agent changed only the unsaved own-app name field from default zip to the owner-provided dot for diagnostics; it did not save/enable call authorization or arm a call.
+- Direct coordinate-based menu probes sometimes focused `CodexRemoteBubbleActivity`. A floating-window interception is a hypothesis, not an established root cause. Only display 0 was focused; display 1 had no focus at inspection.
+- After requesting the fixed-label menu-only accessibility probe, a native `MainActivity` navigation scene was observed. Exact command labels included **Dot**, **Codex**, **새 채팅** and **검색**; unrelated titles/body were excluded from output.
+- **Dot** is a TextView two levels under a clickable `android.view.View`, bounds observed `[0,295][864,421]`; the owner has direct child classes `[android.view.View, android.view.View, android.view.View, android.widget.Button]`. This is not the two-child compact representation. The deeper decorative branches were not captured before disconnection. No selector for the four-child row has been enabled by guessing.
+- The temporary menu diagnostic report was not visible in the scrolled setup area, so its final attempt/acceptance result was not independently read. Do not claim a complete successful semantic-navigation test yet.
+- The latest local 1.4.4-dev adds an explicit sidebar-entry field (profile dot vs entry Dot), saves complete settings with call authorization off, revalidates navigation labels after refresh, and returns unknown target structure as metadata without selecting it. It also brings reports into view. It is built/tested but not installed after the connection loss.
+- The last Fold7 connection endpoint refused reconnection and mDNS inventory is empty. The unrelated recovery device was not accessed. The next owner action is to provide the current wireless-debugging **connection** endpoint; a new pairing code is only needed if the existing pairing is no longer authorized.

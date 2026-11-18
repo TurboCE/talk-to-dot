@@ -20,10 +20,12 @@ public class ZipService extends AccessibilityService {
     final Runnable tick=this::step;
     final Runnable inspectTick=this::inspectStep;
     static String inspectionReport="";
-    long inspectionDeadline;
+    long inspectionDeadline, inspectedMenuAt;
+    boolean inspectMenuMode, inspectionMenuAttempted;
+    String inspectionTarget;
     boolean running, enteredTarget;
     CallPolicy policy;
-    String targetName, lastAction="";
+    String targetName, targetEntry, lastAction="";
     String[] labels;
     long lastClick, unavailableSince=-1;
     int candidateWindow=-1;
@@ -39,17 +41,49 @@ public class ZipService extends AccessibilityService {
         if(running)stop(ResultStatus.CANCELLED);
         CallSettings.clearRequest(prefs().edit()).commit();
         inspectionReport="";inspectionDeadline=SystemClock.elapsedRealtime()+10000;
+        inspectMenuMode=false;inspectionMenuAttempted=false;inspectedMenuAt=0;inspectionTarget="";
         handler.removeCallbacks(inspectTick);handler.postDelayed(inspectTick,0);
+    }
+    void inspectMenuOnce(String name) {
+        inspectOnce();inspectMenuMode=true;
+        inspectionTarget=name==null?"":name.trim();
+        if(inspectionTarget.isEmpty() || inspectionTarget.length()>80)finishInspection("Invalid target; no action performed.");
+    }
+    void finishInspection(String report) {
+        inspectionReport=report;inspectionDeadline=0;
+        Toast.makeText(this,inspectMenuMode?R.string.inspect_menu_done:R.string.inspect_done,Toast.LENGTH_LONG).show();
     }
     void inspectStep() {
         if(inspectionDeadline==0)return;
-        if(SystemClock.elapsedRealtime()>=inspectionDeadline) {
+        long now=SystemClock.elapsedRealtime();
+        if(now>=inspectionDeadline) {
+            inspectionReport=inspectMenuMode?"Menu-only inspection timed out; menu attempts="+(inspectionMenuAttempted?1:0)+"; no call dispatch.\n"+inspectionReport:"Read-only inspection timed out; no actions.";
             inspectionDeadline=0;Toast.makeText(this,R.string.inspect_timeout,Toast.LENGTH_LONG).show();return;
         }
         AccessibilityNodeInfo root=getRootInActiveWindow();
         if(current(root)) {
-            inspectionReport=ScreenInspector.scan(root);inspectionDeadline=0;
-            Toast.makeText(this,R.string.inspect_done,Toast.LENGTH_LONG).show();return;
+            if(inspectMenuMode && !inspectionMenuAttempted) {
+                AccessibilityNodeInfo menu=MenuInspector.candidate(root);
+                if(menu==null && ScreenInspector.targetLabels(root,inspectionTarget)>0) {
+                    finishInspection("Menu attempts=0; exact target metadata only, not a validated selection.\n"+ScreenInspector.targetSummary(root,inspectionTarget));return;
+                }
+                if(menu!=null) {
+                    AccessibilityNodeInfo active=getRootInActiveWindow();
+                    if(!menu.refresh() || !current(active) || !ControlResolver.control(menu,MenuInspector.MENU,true)
+                            || !menu.equals(MenuInspector.candidate(active)) || locked()) {
+                        finishInspection("Menu changed before dispatch; no action performed.");return;
+                    }
+                    // This diagnostic dispatches only the fixed, verified MENU binding, never a setting/call label.
+                    inspectionMenuAttempted=true;inspectedMenuAt=now;
+                    if(!menu.performAction(AccessibilityNodeInfo.ACTION_CLICK)) {finishInspection("Menu action failed; no retry and no call dispatch.");return;}
+                    handler.postDelayed(inspectTick,300);return;
+                }
+            } else if(inspectMenuMode) {
+                inspectionReport="Menu attempts=1; exact target metadata only, not a validated selection.\n"+ScreenInspector.targetSummary(root,inspectionTarget);
+                if(now-inspectedMenuAt>=300 && ScreenInspector.targetLabels(root,inspectionTarget)>0) {
+                    finishInspection(inspectionReport);return;
+                }
+            } else {finishInspection(ScreenInspector.scan(root));return;}
         }
         handler.postDelayed(inspectTick,150);
     }
@@ -66,7 +100,7 @@ public class ZipService extends AccessibilityService {
         if(!CallSettings.PROCESS_ID.equals(prefs().getString("requestProcess",""))
                 || (!attempted && prefs().getBoolean("observedTarget",false))) { stop(ResultStatus.CANCELLED); return; }
         if(!CallSettings.configured(this)) { stop(ResultStatus.CONFIGURE); return; }
-        targetName=DotSettings.name(this); labels=new String[CallSettings.KEYS.length];
+        targetName=DotSettings.name(this);targetEntry=DotSettings.entry(this); labels=new String[CallSettings.KEYS.length];
         for(int i=0;i<labels.length;i++)labels[i]=CallSettings.get(this,i);
         labels=CallSettings.resolved(labels,targetName);
         policy=new CallPolicy(prefs().getLong("startedAtElapsed",-1),attempted,prefs().getLong("attemptedAt",-1));
@@ -135,24 +169,31 @@ public class ZipService extends AccessibilityService {
                 if(!checked.performAction(AccessibilityNodeInfo.ACTION_CLICK)) { stop(ResultStatus.CLICK_FAILED); return; }
             }
         } else if(!destination) {
-            String action=sidebar?"dot":"menu";
-            AccessibilityNodeInfo target=unique(root,sidebar?targetName:labels[1],true);
-            if(target==null && !sidebar && !labels[3].isEmpty()) { target=unique(root,labels[3],true); action="up"; }
+            String action=sidebar?"dot":"menu", expectedLabel=sidebar?targetEntry:labels[1];
+            AccessibilityNodeInfo target=directControl(root,expectedLabel,true);
+            if(target==null && !sidebar && !labels[3].isEmpty()) {
+                expectedLabel=labels[3];target=directControl(root,expectedLabel,true);action="up";
+            }
             if(!sidebar && lastAction.equals("dot") && now-lastClick<4000) { schedule(150); return; }
-            if(target!=null && (!action.equals(lastAction) || now-lastClick>=1000) && navigationAllowed(root,target)) {
+            if(target!=null && (!action.equals(lastAction) || now-lastClick>=1000) && navigationAllowed(root,target,expectedLabel)) {
                 if(target.performAction(AccessibilityNodeInfo.ACTION_CLICK)) { lastAction=action; lastClick=now; }
             }
         }
         if(running)schedule(150);
     }
-    boolean navigationAllowed(AccessibilityNodeInfo previous,AccessibilityNodeInfo target) {
+    boolean navigationAllowed(AccessibilityNodeInfo previous,AccessibilityNodeInfo target,String expectedLabel) {
         AccessibilityNodeInfo active=getRootInActiveWindow();
         if(!current(active))return false;
         if(ambiguousState(active)) { stop(ResultStatus.AMBIGUOUS); return false; }
-        return !policy.expired(SystemClock.elapsedRealtime()) && !locked()
-                && active.getWindowId()==previous.getWindowId() && target.refresh() && chatGpt(target)
-                && target.getWindowId()==active.getWindowId() && target.isVisibleToUser()
-                && target.isEnabled() && target.isClickable();
+        if(stateCount(active,labels[5])>0) { stop(ResultStatus.ALREADY); return false; }
+        if(expectedLabel.equals(labels[4]) || expectedLabel.equals(labels[5]))return false;
+        if(policy.expired(SystemClock.elapsedRealtime()) || locked() || active.getWindowId()!=previous.getWindowId()
+                || !target.equals(directControl(active,expectedLabel,true)) || !target.refresh())return false;
+        AccessibilityNodeInfo latest=getRootInActiveWindow();
+        return current(latest) && latest.getWindowId()==previous.getWindowId() && !ambiguousState(latest)
+                && stateCount(latest,labels[5])==0 && target.equals(directControl(latest,expectedLabel,true))
+                && ControlResolver.control(target,expectedLabel,true) && chatGpt(target)
+                && target.getWindowId()==latest.getWindowId() && !locked() && !policy.expired(SystemClock.elapsedRealtime());
     }
     boolean locked() {
         KeyguardManager keyguard=(KeyguardManager)getSystemService(KEYGUARD_SERVICE);
@@ -219,22 +260,5 @@ public class ZipService extends AccessibilityService {
         if(node==null || found.size()>1)return;
         if(ControlResolver.control(node,label,buttonRole))found.add(node);
         for(int i=0;i<node.getChildCount();i++)collectControls(node.getChild(i),label,buttonRole,found);
-    }
-    AccessibilityNodeInfo unique(AccessibilityNodeInfo root,String label,boolean clickable) {
-        if(label.isEmpty())return null;
-        List<AccessibilityNodeInfo> found=new ArrayList<>();collect(root,label,clickable,found);
-        return found.size()==1?found.get(0):null;
-    }
-    void collect(AccessibilityNodeInfo node,String label,boolean clickable,List<AccessibilityNodeInfo> out) {
-        if(node==null || out.size()>1)return;
-        if(node.isVisibleToUser() && node.isEnabled() && matches(node,label)) {
-            AccessibilityNodeInfo target=node;
-            if(clickable) {
-                for(int i=0;i<6 && target!=null && !target.isClickable();i++)target=target.getParent();
-                if(target!=null && (!target.isEnabled() || !target.isVisibleToUser()))target=null;
-            }
-            if(target!=null && !out.contains(target))out.add(target);
-        }
-        for(int i=0;i<node.getChildCount();i++)collect(node.getChild(i),label,clickable,out);
     }
 }

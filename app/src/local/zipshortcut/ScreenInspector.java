@@ -48,4 +48,36 @@ final class ScreenInspector {
         if(input!=null) {counts[1]++;result.append("Input label: ").append(input).append('\n');}
         for(int i=0;i<node.getChildCount();i++)walk(node.getChild(i),result,counts);
     }
+    static int targetLabels(AccessibilityNodeInfo node,String name) {
+        if(node==null)return 0;
+        int count=ControlResolver.explicit(node,name)?1:0;
+        for(int i=0;i<node.getChildCount();i++)count+=targetLabels(node.getChild(i),name);
+        return count;
+    }
+    static int targetControls(AccessibilityNodeInfo n,String name) {
+        if(n==null)return 0;
+        int count=ControlResolver.control(n,name,true)?1:0;
+        for(int i=0;i<n.getChildCount();i++)count+=targetControls(n.getChild(i),name);
+        return count;
+    }
+    static String targetSummary(AccessibilityNodeInfo root,String name) {
+        StringBuilder report=new StringBuilder("menu-only; no call dispatch\nTarget: ").append(name)
+                .append("\nrecognizedTargetControls=").append(targetControls(root,name)).append('\n');
+        targetNodes(root,name,report,new int[]{0});return report.toString();
+    }
+    static void targetNodes(AccessibilityNodeInfo n,String name,StringBuilder report,int[] seen) {
+        if(n==null || seen[0]>=8)return;
+        if(ControlResolver.explicit(n,name)) {
+            seen[0]++;AccessibilityNodeInfo owner=n;int depth=0;
+            while(owner!=null && !owner.isClickable() && depth<8) {owner=owner.getParent();depth++;}
+            report.append("target label class=").append(n.getClassName()).append("; clickOwnerDepth=").append(depth);
+            if(owner!=null && owner.isClickable()) {
+                report.append("; owner=").append(owner.getClassName()).append("; children=").append(owner.getChildCount())
+                        .append("; verifiedRole=").append(ControlResolver.control(owner,name,true));
+            } else report.append("; no bounded click owner");
+            report.append('\n');
+        }
+        for(int i=0;i<n.getChildCount();i++)targetNodes(n.getChild(i),name,report,seen);
+    }
+
 }

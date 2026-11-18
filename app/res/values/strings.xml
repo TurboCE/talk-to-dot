@@ -36,4 +36,8 @@
  <string name="inspect_enable">Enable this Accessibility service manually first. Inspection never starts a call.</string>
  <string name="inspect_done">Controls inspected without clicks. Return to setup to read the temporary report.</string>
  <string name="inspect_timeout">Inspection timed out. No clicks or calls were made.</string>
+ <string name="inspect_menu">Open verified menu and inspect (no call)</string>
+ <string name="inspect_menu_done">Menu-only inspection finished. No call was dispatched. Return to setup for the temporary report.</string>
+ <string name="saved_disabled">Verified settings saved with call authorization OFF. No call was armed.</string>
+ <string name="dot_entry">Exact sidebar entry label (optional; defaults to Dot name)</string>
 </resources>

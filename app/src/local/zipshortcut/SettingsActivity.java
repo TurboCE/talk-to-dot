@@ -6,7 +6,7 @@ import android.provider.Settings;
 import android.widget.*;
 
 public class SettingsActivity extends Activity {
-    EditText name;
+    EditText name,entry;
     EditText[] fields=new EditText[CallSettings.KEYS.length];
     CheckBox consent;
     Spinner icons;
@@ -23,6 +23,7 @@ public class SettingsActivity extends Activity {
         inspection=new TextView(this);inspection.setContentDescription(getString(R.string.inspect_report));
         inspection.setTextIsSelectable(true);box.addView(inspection);
         name=field(box,R.string.dot_name,DotSettings.name(this)); name.setId(99);
+        entry=field(box,R.string.dot_entry,getSharedPreferences("shortcut",0).getString("dotEntry",""));entry.setId(106);
         int[] titles={R.string.composer,R.string.menu_label,R.string.sidebar_label,R.string.up_label,R.string.call_label,R.string.connected_label};
         for(int i=0;i<fields.length;i++) { fields[i]=field(box,titles[i],CallSettings.get(this,i)); fields[i].setId(100+i); }
         TextView iconTitle=new TextView(this); iconTitle.setText(R.string.icon); box.addView(iconTitle);
@@ -40,6 +41,12 @@ public class SettingsActivity extends Activity {
             if(chat==null) {Toast.makeText(this,R.string.missing_app,Toast.LENGTH_LONG).show();return;}
             ZipService.instance.inspectOnce();startActivity(chat);
         });
+        button(box,R.string.inspect_menu,()-> {
+            if(ZipService.instance==null) {Toast.makeText(this,R.string.inspect_enable,Toast.LENGTH_LONG).show();return;}
+            Intent chat=getPackageManager().getLaunchIntentForPackage("com.openai.chatgpt");
+            if(chat==null) {Toast.makeText(this,R.string.missing_app,Toast.LENGTH_LONG).show();return;}
+            ZipService.instance.inspectMenuOnce(entry.getText().toString().trim().isEmpty()?name.getText().toString():entry.getText().toString());startActivity(chat);
+        });
         button(box,R.string.access,()->startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)));
         button(box,R.string.cancel,()-> { if(ZipService.instance!=null)ZipService.instance.stop(ResultStatus.CANCELLED);
             else CallSettings.clearRequest(getSharedPreferences("shortcut",0).edit()).commit(); });
@@ -50,6 +57,10 @@ public class SettingsActivity extends Activity {
         if(inspection!=null) {
             inspection.setText(ZipService.inspectionReport);
             inspection.setVisibility(ZipService.inspectionReport.isEmpty()?android.view.View.GONE:android.view.View.VISIBLE);
+            if(!ZipService.inspectionReport.isEmpty())inspection.post(()-> {
+                inspection.setFocusableInTouchMode(true);inspection.requestFocus();
+                inspection.requestRectangleOnScreen(new android.graphics.Rect(0,0,inspection.getWidth(),inspection.getHeight()),false);
+            });
         }
     }
     EditText field(LinearLayout box,int label,String value) {
@@ -59,12 +70,12 @@ public class SettingsActivity extends Activity {
     void button(LinearLayout box,int title,Runnable action) { Button b=new Button(this); b.setText(title); b.setOnClickListener(v->action.run()); box.addView(b); }
     boolean save() {
         String[] values=new String[fields.length]; for(int i=0;i<fields.length;i++)values[i]=fields[i].getText().toString().trim();
-        if(!CallSettings.store(this,name.getText().toString(),values,consent.isChecked())) {
+        if(!CallSettings.store(this,name.getText().toString(),values,consent.isChecked(),entry.getText().toString())) {
             Toast.makeText(this,R.string.invalid,Toast.LENGTH_LONG).show(); return false;
         }
         if(ZipService.instance!=null && ZipService.instance.running)ZipService.instance.stop(ResultStatus.CANCELLED);
         if(!consent.isChecked()) {
-            Toast.makeText(this,R.string.consent_revoked,Toast.LENGTH_LONG).show(); return true;
+            Toast.makeText(this,CallSettings.complete(values,name.getText().toString(),entry.getText().toString())?R.string.saved_disabled:R.string.consent_revoked,Toast.LENGTH_LONG).show(); return true;
         }
         try { IconSettings.save(this,IconSettings.CHOICES[icons.getSelectedItemPosition()]); }
         catch(IllegalArgumentException | SecurityException e) { Toast.makeText(this,R.string.icon_failed,Toast.LENGTH_LONG).show(); return false; }

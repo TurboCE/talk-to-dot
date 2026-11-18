@@ -100,6 +100,12 @@ public final class ReviewRegressionTest {
         tick(s,600);check(!s.running);check(call.clicks==0);check(!CallSettings.configured(s));
         check(!CallSettings.store(s,"zip",colliding,true));check(!s.preferences.getBoolean("consent",true));
         check(CallSettings.store(s,"zip",labels,true));check(CallSettings.configured(s));
+        check(CallSettings.store(s,"otherDot",labels,false));check(DotSettings.name(s).equals("otherDot"));
+        check(!s.preferences.getBoolean("consent",true));check(!CallSettings.configured(s));
+        check(CallSettings.store(s,"",new String[]{},false));check(DotSettings.name(s).equals("otherDot"));
+        check(CallSettings.store(s,"dot",labels,false,"Dot"));check(DotSettings.entry(s).equals("Dot"));
+        check(DotSettings.name(s).equals("dot"));check(!CallSettings.configured(s));
+        check(!CallSettings.complete(labels,"dot","REAL_CALL"));check(!CallSettings.complete(labels,"dot","Menu"));
         // 6. Transcript text, even clickable TextViews, cannot indicate sidebar or call state.
         s=service();call=node("REAL_CALL",true);s.root.add(composer()).add(call).add(new BodyText("Scheduled",false)).add(new BodyText("REAL_END",false));
         tick(s,100);tick(s,600);check(call.clicks==1);
@@ -135,6 +141,17 @@ public final class ReviewRegressionTest {
             s.root=node("root",false).add(node(marker,true)).add(node(marker,true));tick(s,700);tick(s,1200);
             check(call.clicks==1);check(!s.running);check(s.preferences.getString("lastResult","").equals(ResultStatus.AMBIGUOUS));
         }
+        // Navigation is semantic and label-bound too: refreshed menu controls cannot become call actions.
+        s=service();AccessibilityNodeInfo changingMenu=new AccessibilityNodeInfo("Menu"){
+            {clickable=true;}
+            @Override public boolean refresh(){label="REAL_CALL";return true;}};
+        s.root.add(changingMenu);tick(s,100);check(changingMenu.clicks==0);
+        check(!CallSettings.valid(labels,"REAL_CALL"));check(!CallSettings.valid(labels,"REAL_END"));
+        check(!CallSettings.valid(labels,"Menu"));
+        s=service();s.running=false;s.preferences.edit().putString("dotName","dot").putString("dotEntry","Dot").putString("sidebar","Dot").apply();s.begin();
+        check(s.targetEntry.equals("Dot"));AccessibilityNodeInfo actualEntry=node("Dot",true);s.root.add(actualEntry);tick(s,100);check(actualEntry.clicks==1);
+        AccessibilityNodeInfo namedComposer=node("Message dot",false);namedComposer.editable=true;call=node("REAL_CALL",true);
+        s.root=node("root",false).add(namedComposer).add(call);tick(s,200);tick(s,700);check(call.clicks==1);
         // 7. Persistent outcomes are names. Legacy/unknown integer IDs are never dereferenced.
         s=service();s.preferences.edit().putInt("lastStatus",Integer.MAX_VALUE).apply();s.stop(ResultStatus.CANCELLED);
         check(s.preferences.getInt("lastStatus",0)==0);check(s.preferences.getString("lastResult","").equals("cancelled"));
