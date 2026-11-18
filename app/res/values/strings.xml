@@ -1,7 +1,7 @@
 <resources>
  <string name="configure_dot">Configure Dot call</string>
  <string name="service_description">After explicit launch, navigates only within ChatGPT and attempts one call-button click for your selected Dot, then checks a configured call-screen marker. Stops within 30 seconds. Reads screen labels, but does not store chat content, record audio, send messages, or use the internet. Configure and verify labels before enabling.</string>
- <string name="setup_help">This starts a real call in the existing ChatGPT app. No TTS or API. Accessibility can read and control screens. This app acts only in ChatGPT for up to 30 seconds after launch. No internet permission, chat logging, audio recording, or backups. Names and labels stay on this device.\n\nVerify exact accessibility text/content descriptions on your phone. English navigation defaults come from upstream and may not match your version. Call and call-screen labels are intentionally blank. No guessed labels or coordinates. Use a call-screen-only control such as the actual end-call control as confirmation; it is never clicked. This detects a screen, not audible connection.\n\nEnable this service manually in Android Accessibility. To change settings later, long-press the app icon and choose Configure Dot call, or open this service\'s settings. Unlock before launching from Bixby or a routine.\n\nState markers require an enabled actionable Button/ImageButton, either directly labelled or with the verified paired Compose label/role structure. Conversation text and arbitrary ancestors are excluded. A missing tree waits at most 1 second after ChatGPT is seen. Interrupted pre-click sessions and requests from a previous process are cancelled. Uncheck authorization and save to revoke it even with incomplete fields.</string>
+ <string name="setup_help">Open Voice to Dot from a Samsung routine to start the configured Dot call in ChatGPT. Unlock the phone first. Enable this accessibility service manually, configure the exact controls, and authorize automatic calling.\n\nAccessibility can read and control ChatGPT screens for up to 30 seconds after launch. No internet permission, recording, chat logs, or backups. Settings remain on this device. Uncheck authorization and save to revoke it. Call-screen detection does not prove audible connection.</string>
  <string name="dot_name">Exact Dot name</string>
  <string name="composer">Destination input label (must include {dot})</string>
  <string name="menu_label">Exact menu label</string>
@@ -9,7 +9,6 @@
  <string name="up_label">Exact navigate-up label (optional)</string>
  <string name="call_label">Exact call button label (verify on device)</string>
  <string name="connected_label">Exact call-screen-only marker (verify on device)</string>
- <string name="icon">Home screen icon</string>
  <string name="consent">I verified these labels and authorize a single real ChatGPT call attempt each time I launch this shortcut.</string>
  <string name="save">Save</string>
  <string name="save_open">Save and call Dot</string>
@@ -17,7 +16,6 @@
  <string name="cancel">Cancel pending attempt</string>
  <string name="last_result">Last result:</string>
  <string name="invalid">Enter a Dot name and distinct verified labels; destination must include {dot}. Confirm the call authorization.</string>
- <string name="icon_failed">Could not change launcher icon.</string>
  <string name="saved">Settings saved</string>
  <string name="locked">Unlock your phone and launch again.</string>
  <string name="missing_app">ChatGPT could not be opened. Install and sign in first.</string>
@@ -28,7 +26,6 @@
  <string name="confirmed">Configured call screen detected. Audio connection is not verified.</string>
  <string name="already_call">Call-screen marker already present. No call button clicked.</string>
  <string name="click_failed">Call click failed. No retry. Check ChatGPT manually.</string>
- <string-array name="icons"><item>Frog</item><item>Cat</item><item>Fox</item><item>Bear</item><item>Owl</item><item>Classic D</item></string-array>
  <string name="consent_revoked">Call authorization revoked. Pending automation cancelled; an existing call is not ended.</string>
  <string name="ambiguous_state">Multiple sidebar or call-screen controls found. Automation stopped without another click. Check ChatGPT and any ongoing call manually.</string>
  <string name="inspect_controls">Inspect ChatGPT controls (no clicks)</string>
@@ -42,4 +39,5 @@
  <string name="dot_entry">Exact sidebar entry label (optional; defaults to Dot name)</string>
  <string name="inspect_entry">Open verified Dot entry only (no call)</string>
  <string name="apply_fold_profile">Apply observed Fold7 Korean labels (calls OFF)</string>
+ <string name="advanced_settings">Advanced setup and diagnostics</string>
 </resources>

@@ -9,7 +9,6 @@ public class SettingsActivity extends Activity {
     EditText name,entry;
     EditText[] fields=new EditText[CallSettings.KEYS.length];
     CheckBox consent;
-    Spinner icons;
     TextView inspection,lastResult;
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
@@ -27,33 +26,32 @@ public class SettingsActivity extends Activity {
         TextView help=new TextView(this); help.setText(R.string.setup_help); box.addView(help);
         lastResult=new TextView(this);box.addView(lastResult);
         inspection=new TextView(this);inspection.setContentDescription(getString(R.string.inspect_report));
-        inspection.setTextIsSelectable(true);box.addView(inspection);
-        name=field(box,R.string.dot_name,DotSettings.name(this)); name.setId(99);
-        entry=field(box,R.string.dot_entry,getSharedPreferences("shortcut",0).getString("dotEntry",""));entry.setId(106);
+        inspection.setTextIsSelectable(true);
+        LinearLayout advanced=new LinearLayout(this);advanced.setOrientation(1);
+        advanced.setVisibility(android.view.View.GONE);
+        button(box,R.string.advanced_settings,()->advanced.setVisibility(advanced.getVisibility()==android.view.View.GONE?android.view.View.VISIBLE:android.view.View.GONE));
+        box.addView(advanced);advanced.addView(inspection);
+        name=field(advanced,R.string.dot_name,DotSettings.name(this)); name.setId(99);
+        entry=field(advanced,R.string.dot_entry,getSharedPreferences("shortcut",0).getString("dotEntry",""));entry.setId(106);
         int[] titles={R.string.composer,R.string.menu_label,R.string.sidebar_label,R.string.up_label,R.string.call_label,R.string.connected_label};
-        for(int i=0;i<fields.length;i++) { fields[i]=field(box,titles[i],CallSettings.get(this,i)); fields[i].setId(100+i); }
-        TextView iconTitle=new TextView(this); iconTitle.setText(R.string.icon); box.addView(iconTitle);
-        icons=new Spinner(this); icons.setId(201);
-        icons.setAdapter(new ArrayAdapter<String>(this,android.R.layout.simple_spinner_dropdown_item,getResources().getStringArray(R.array.icons)));
-        for(int i=0;i<IconSettings.CHOICES.length;i++)if(IconSettings.CHOICES[i].id.equals(IconSettings.current(this).id))icons.setSelection(i);
-        box.addView(icons);
+        for(int i=0;i<fields.length;i++) { fields[i]=field(advanced,titles[i],CallSettings.get(this,i)); fields[i].setId(100+i); }
         consent=new CheckBox(this); consent.setId(200); consent.setText(R.string.consent);
         consent.setChecked(getSharedPreferences("shortcut",0).getBoolean("consent",false)); box.addView(consent);
         button(box,R.string.save,()->save());
         button(box,R.string.save_open,()-> {if(save() && consent.isChecked()) { startActivity(new Intent(this,LauncherActivity.class)); finish(); }});
-        button(box,R.string.inspect_controls,()-> {
+        button(advanced,R.string.inspect_controls,()-> {
             if(ZipService.instance==null) {Toast.makeText(this,R.string.inspect_enable,Toast.LENGTH_LONG).show();return;}
             Intent chat=getPackageManager().getLaunchIntentForPackage("com.openai.chatgpt");
             if(chat==null) {Toast.makeText(this,R.string.missing_app,Toast.LENGTH_LONG).show();return;}
             ZipService.instance.inspectOnce();startActivity(chat);
         });
-        button(box,R.string.inspect_menu,()-> {
+        button(advanced,R.string.inspect_menu,()-> {
             if(ZipService.instance==null) {Toast.makeText(this,R.string.inspect_enable,Toast.LENGTH_LONG).show();return;}
             Intent chat=getPackageManager().getLaunchIntentForPackage("com.openai.chatgpt");
             if(chat==null) {Toast.makeText(this,R.string.missing_app,Toast.LENGTH_LONG).show();return;}
             ZipService.instance.inspectMenuOnce(entry.getText().toString().trim().isEmpty()?name.getText().toString():entry.getText().toString());startActivity(chat);
         });
-        button(box,R.string.inspect_entry,()-> {
+        button(advanced,R.string.inspect_entry,()-> {
             if(ZipService.instance==null) {Toast.makeText(this,R.string.inspect_enable,Toast.LENGTH_LONG).show();return;}
             Intent chat=getPackageManager().getLaunchIntentForPackage("com.openai.chatgpt");
             if(chat==null) {Toast.makeText(this,R.string.missing_app,Toast.LENGTH_LONG).show();return;}
@@ -74,7 +72,7 @@ public class SettingsActivity extends Activity {
         if(inspection!=null) {
             inspection.setText(ZipService.inspectionReport);
             inspection.setVisibility(ZipService.inspectionReport.isEmpty()?android.view.View.GONE:android.view.View.VISIBLE);
-            if(!ZipService.inspectionReport.isEmpty())inspection.post(()-> {
+            if(!ZipService.inspectionReport.isEmpty() && inspection.isShown())inspection.post(()-> {
                 inspection.setFocusableInTouchMode(true);inspection.requestFocus();
                 inspection.requestRectangleOnScreen(new android.graphics.Rect(0,0,inspection.getWidth(),inspection.getHeight()),false);
             });
@@ -94,8 +92,6 @@ public class SettingsActivity extends Activity {
         if(!consent.isChecked()) {
             Toast.makeText(this,CallSettings.complete(values,name.getText().toString(),entry.getText().toString())?R.string.saved_disabled:R.string.consent_revoked,Toast.LENGTH_LONG).show(); return true;
         }
-        try { IconSettings.save(this,IconSettings.CHOICES[icons.getSelectedItemPosition()]); }
-        catch(IllegalArgumentException | SecurityException e) { Toast.makeText(this,R.string.icon_failed,Toast.LENGTH_LONG).show(); return false; }
         Toast.makeText(this,R.string.saved,Toast.LENGTH_SHORT).show(); return true;
     }
 }

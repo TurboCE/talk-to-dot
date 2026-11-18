@@ -20,7 +20,7 @@ This Android shortcut opens the **existing ChatGPT app**, navigates to the selec
 
 ### Galaxy Fold7 / Bixby / Routines
 
-After a successful manual test, choose Talk to Dot as the app to launch in whatever Bixby/Routines launch-app action your device exposes. A stable entry is `local.zipshortcut/.LauncherActivity`. Changing launcher icons may require selecting the app again in the routine. The utility will not unlock the phone. Test both folded and unfolded layouts separately. No Samsung-specific UI path or supported automation action is asserted without device evidence.
+After a successful manual test, choose Voice to Dot as the app to launch in whatever Bixby/Routines launch-app action your device exposes. A stable entry is `local.zipshortcut/.LauncherActivity`. A single microphone icon is used; legacy launcher component identities remain for update compatibility. The utility will not unlock the phone. Test both folded and unfolded layouts separately. No Samsung-specific UI path or supported automation action is asserted without device evidence.
 
 Optional installation by an already authorized ADB connection:
 

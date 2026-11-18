@@ -1,7 +1,7 @@
 <resources>
  <string name="configure_dot">닷 통화 설정</string>
  <string name="service_description">직접 실행한 후 ChatGPT 안에서만 선택한 닷으로 이동하고 전화 버튼을 한 번만 누른 뒤 설정한 통화 화면 표시를 확인합니다. 30초 이내에 종료합니다. 화면 라벨을 읽지만 대화 저장, 녹음, 메시지 전송, 인터넷 사용은 하지 않습니다. 먼저 기기의 라벨을 확인하고 설정하세요.</string>
- <string name="setup_help">기존 ChatGPT 앱의 실제 닷 통화를 시작합니다. TTS나 API를 사용하지 않습니다. 접근성 권한은 화면을 읽고 조작할 수 있습니다. 실행 후 최대 30초 동안 ChatGPT에서만 작동합니다. 인터넷 권한, 대화 기록, 녹음, 백업이 없습니다. 이름과 라벨은 기기에만 저장됩니다.\n\n기기에서 접근성 텍스트/콘텐츠 설명을 정확히 확인하세요. 영어 탐색 기본값은 원본 코드에서 가져왔으며 현재 버전과 다를 수 있습니다. 전화 버튼과 통화 화면 라벨은 추측하지 않고 빈칸으로 두었습니다. 좌표를 누르지 않습니다. 통화 화면에만 나타나는 실제 통화 종료 버튼 등의 라벨을 확인 표시로 지정하세요. 확인 표시는 누르지 않습니다. 화면 감지만 하며 음성 연결은 검증하지 않습니다.\n\nAndroid 접근성 설정에서 서비스를 직접 켜세요. 이후 설정 변경은 앱 아이콘 길게 누르기 → 닷 통화 설정 또는 접근성 서비스 설정에서 가능합니다. 빅스비나 루틴으로 실행하기 전에 잠금을 해제하세요.\n\n상태 표시는 활성화된 Button/ImageButton 역할과 클릭 소유자가 필요합니다. 직접 라벨 또는 실기기에서 확인한 Compose 라벨·버튼 역할 연결 구조만 허용하고, 대화 본문과 임의 조상은 제외합니다. ChatGPT 확인 후 화면 트리가 없으면 최대 1초 기다립니다. 클릭 전 서비스 재연결과 이전 프로세스의 요청은 취소합니다. 다른 입력이 불완전해도 허용 체크를 해제하고 저장하면 통화 허용을 철회할 수 있습니다.</string>
+ <string name="setup_help">삼성 루틴에서 Voice to Dot 앱을 실행하면 설정한 Dot의 ChatGPT 음성 통화를 시작합니다. 먼저 잠금을 해제하세요. 접근성 서비스를 직접 켜고 정확한 버튼을 설정한 뒤 자동 통화를 허용하세요.\n\n접근성 권한으로 실행 후 최대 30초 동안 ChatGPT 화면을 읽고 조작합니다. 인터넷 권한·녹음·대화 기록·백업은 없으며 설정은 기기에만 저장됩니다. 허용 체크를 해제하고 저장하면 철회됩니다. 통화 화면 감지는 실제 음성 연결을 보장하지 않습니다.</string>
  <string name="dot_name">닷 이름 (정확히 입력)</string>
  <string name="composer">대상 입력창 라벨 ({dot} 포함 필수)</string>
  <string name="menu_label">메뉴의 정확한 라벨</string>
@@ -9,7 +9,6 @@
  <string name="up_label">뒤로/위로 이동 라벨 (선택)</string>
  <string name="call_label">전화 버튼의 정확한 라벨 (실기기 확인)</string>
  <string name="connected_label">통화 화면에만 있는 라벨 (실기기 확인)</string>
- <string name="icon">홈 화면 아이콘</string>
  <string name="consent">이 라벨을 직접 확인했으며 이 바로가기를 실행할 때마다 실제 ChatGPT 통화를 한 번 시도하도록 허용합니다.</string>
  <string name="save">저장</string>
  <string name="save_open">저장하고 닷에 전화</string>
@@ -17,7 +16,6 @@
  <string name="cancel">진행 중인 시도 취소</string>
  <string name="last_result">마지막 결과:</string>
  <string name="invalid">닷 이름과 서로 다른 라벨을 입력하세요. 대상 입력창에는 {dot}이 필요합니다. 통화 실행 허용을 확인하세요.</string>
- <string name="icon_failed">런처 아이콘을 변경하지 못했습니다.</string>
  <string name="saved">설정을 저장했습니다.</string>
  <string name="locked">잠금을 해제한 뒤 다시 실행하세요.</string>
  <string name="missing_app">ChatGPT를 열지 못했습니다. 먼저 설치하고 로그인하세요.</string>
@@ -28,7 +26,6 @@
  <string name="confirmed">설정한 통화 화면을 감지했습니다. 음성 연결은 검증하지 않았습니다.</string>
  <string name="already_call">통화 화면 표시가 이미 있습니다. 전화 버튼을 누르지 않았습니다.</string>
  <string name="click_failed">전화 버튼 누르기에 실패했습니다. 재시도하지 않습니다. ChatGPT에서 확인하세요.</string>
- <string-array name="icons"><item>개구리</item><item>고양이</item><item>여우</item><item>곰</item><item>올빼미</item><item>기본 D</item></string-array>
  <string name="consent_revoked">통화 실행 허용을 해제하고 진행 중인 자동화를 취소했습니다. 이미 시작한 통화는 종료하지 않습니다.</string>
  <string name="ambiguous_state">사이드바 또는 통화 화면 표시가 여러 개라 자동화를 중지했습니다. 추가로 누르지 않습니다. ChatGPT와 진행 중인 통화를 직접 확인하세요.</string>
  <string name="inspect_controls">ChatGPT 컨트롤 진단 (누르지 않음)</string>
@@ -42,4 +39,5 @@
  <string name="dot_entry">사이드바 항목 라벨 (선택 · 비우면 닷 이름 사용)</string>
  <string name="inspect_entry">Dot 항목 진입만 테스트 (통화하지 않음)</string>
  <string name="apply_fold_profile">관찰된 Fold7 한국어 라벨 적용 (통화 허용 꺼짐)</string>
+ <string name="advanced_settings">고급 설정 및 진단</string>
 </resources>

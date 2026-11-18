@@ -1,6 +1,6 @@
 # Release readiness — Voice to Dots
 
-Current source/build and installed device version: **1.4.6-dev / versionCode 13**. The identified Samsung SM-F966N passed the non-call service probes with the unchanged core service in 1.4.5-dev; the later patch refreshes the stable outcome on setup resume. The final same-signature update succeeded and all eight prepared fields plus call authorization OFF were reverified. This remains an MIT fork of Talk to Dot; stable publication is blocked by the acceptance items below. The published 1.4.0 prerelease predates the safety fixes and is not the current build.
+Current local source/build: **1.4.7-dev / versionCode 14**; device trial used **1.4.6-dev / versionCode 13**. The identified Samsung SM-F966N passed the non-call service probes with the unchanged core service in 1.4.5-dev; the later patch refreshes the stable outcome on setup resume. The final same-signature update succeeded and all eight prepared fields plus call authorization OFF were reverified. This remains an MIT fork of Talk to Dot; stable publication is blocked by the acceptance items below. The published 1.4.0 prerelease predates the safety fixes and is not the current build.
 
 ## Completed
 
@@ -9,7 +9,9 @@ Current source/build and installed device version: **1.4.6-dev / versionCode 13*
 - Local JDK 17 / Android 36 / build tools 36.1.0 compilation, D8, packaging, alignment and APK v2/v3 signature verification pass. Runtime minimum API 26, target 36; device Android 17 / API 37, ChatGPT 1.2026.314.
 - Actual service recognizes normal-screen menu/call owners and paired input label. It opened the menu once and recognized the exact native four-child Dot row with unique Korean drawer anchors.
 - Actual entry-only service test dispatched exactly one action to that verified native Dot row and observed the normal Dot input/menu/call controls. It contains no call dispatch.
-- All eight observed profile/entry/label fields were verified on the device; **call authorization remains OFF**. Same-signature updates preserved settings. No original app or data was removed and no device permission was enabled by the agent.
+- All eight observed profile/entry/label fields were verified on the device; call authorization was OFF before the announced trial. Same-signature updates preserved settings. No original app or data was removed and no device permission was enabled by the agent.
+- The announced app-originated trial reached the saved confirmed-screen result. No direct ADB ChatGPT call-button tap was used. Owner audio confirmation is pending. The app's own call authorization was then saved OFF without selecting launch again.
+- UI source now uses Voice to Dot, one neutral microphone icon, and collapsible advanced configuration/diagnostics. Legacy launcher component names remain available for existing routine references. Version 14 is built locally, not installed yet.
 - Earlier explicitly announced ADB call/start-end tests identified the active `종료` control and the owner reported audio. Those calls were **not** started by this app.
 
 ## Saved observed profile
@@ -29,7 +31,7 @@ Only the observed Korean ChatGPT structure is established. English setup resourc
 
 ## Remaining stable-release gates
 
-1. **Announce and coordinate one app-originated live call.** Enable the app's own call authorization only for the coordinated test, invoke its launcher once and distinguish its Accessibility action from a direct ADB phone-button tap. Verify the app's stable result and owner-confirmed audio. End the test call with the owner; never schedule an unannounced retry.
+1. **Owner audio confirmation remains pending for the announced app-originated trial.** The app's Save-and-call button was selected exactly once; no ADB ChatGPT call-button action occurred. The saved result reports the configured call screen detected. Microphone app-ops reported approximately 47 seconds of use and was no longer running when observed. This establishes app call-screen detection, not audible conversation or who ended the call. Never repeat without notice.
 2. Verify natural startup/return/cold navigation, missing-label timeout, repeated invocation, app departure/interruption, authorization revocation and locked-device refusal. Synthetic tests remain the only evidence for scenarios the real provider cannot safely reproduce, such as duplicate controls.
 3. Establish physical folded/unfolded behavior with the owner. Display dimensions alone are not proof of state. Verify any persistent side-pane behavior before claiming both layouts work.
 4. Verify the exact Bixby/Routines launch-app action actually available on the device. Owner handles any system permission/settings changes. The utility does not unlock the phone.
