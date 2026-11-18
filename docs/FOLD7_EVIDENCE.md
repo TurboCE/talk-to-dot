@@ -79,3 +79,11 @@ The retained-signature 1.4.9-dev / code16 update subsequently installed successf
 With installed code16, actual service binding and a pretrial cancelled outcome were verified. The utility's own authorization was saved ON; then **Voice to Dot 시작** was selected exactly once in Samsung Routines. No direct utility-launch or ChatGPT phone-button ADB action was used.
 
 At about 19 seconds and again after 35 seconds, ChatGPT's microphone app-op showed a new running session. After the complete attempt deadline, the utility's saved result was **configured call screen detected**. This is successful routine-to-app call-screen initiation evidence; audible response remains owner-confirmed only. After reading the result, the agent returned to the existing ChatGPT call screen without clicking a phone control or starting another session. Owner feedback/termination is pending at the time of this record.
+
+## Korean name and optional Bixby handoff (code17, no live call)
+
+User Bixby invocation appeared in Routines → utility → provider activity records. Its response panel remained over Dot, with no new provider microphone use. Investigation operated only on the identified Fold7. The installed/public Bixby launcher and accessible root established its exact package.
+
+Only the created routine was renamed **닷 음성 실행**; its sole app-open action/manual trigger remained unchanged. A temporary UiAutomator jar performed ACTION_SET_TEXT on the exact routine-name EditText and verified the value, allowing Korean input without installing/changing keyboards. The jar was removed; no routine Start was selected.
+
+Retained-signature code17 installed successfully. Applying the observed profile kept calls OFF and enabled optional Bixby handoff. Explicit Bixby-only probes with calls OFF produced: keyboard-open timeout after one Back; then keyboard-hidden return to setup with **Bixby-only; Back attempts=1; Bixby no longer active; no call dispatch**. Provider microphone use remained unchanged. These isolated dismissal checks do not establish a spoken-command or live-call pass.

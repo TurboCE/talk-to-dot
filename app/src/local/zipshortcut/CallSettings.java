@@ -30,14 +30,15 @@ final class CallSettings {
                 && (values[3].isEmpty() || !target.equals(values[3]));
     }
     static final String[] OBSERVED_FOLD_LABELS={"내 {dot}에게 메시지 보내기","메뉴","Dot","상위 화면으로 이동","통화","종료"};
-    static boolean applyObservedFoldProfile(Context c) {return store(c,"dot",OBSERVED_FOLD_LABELS,false,"Dot");}
+    static boolean applyObservedFoldProfile(Context c) {return store(c,"dot",OBSERVED_FOLD_LABELS,false,"Dot")
+            && c.getSharedPreferences("shortcut",0).edit().putBoolean("dismissBixby",true).commit();}
     static boolean configured(Context c) {
         String[] v=new String[KEYS.length]; for(int i=0;i<v.length;i++)v[i]=get(c,i);
         return complete(v,DotSettings.name(c),DotSettings.entry(c)) && c.getSharedPreferences("shortcut",0).getBoolean("consent",false);
     }
     static SharedPreferences.Editor clearRequest(SharedPreferences.Editor e) {
         return e.remove("startedAtElapsed").remove("armedUntil").remove("callAttempted")
-                .remove("attemptedAt").remove("observedTarget").remove("requestProcess");
+                .remove("attemptedAt").remove("bixbyDismissed").remove("observedTarget").remove("requestProcess");
     }
     static boolean cancelRequest(Context c) {
         return clearRequest(c.getSharedPreferences("shortcut",0).edit()).remove("lastStatus")

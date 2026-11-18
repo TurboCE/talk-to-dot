@@ -8,7 +8,7 @@ import android.widget.*;
 public class SettingsActivity extends Activity {
     EditText name,entry;
     EditText[] fields=new EditText[CallSettings.KEYS.length];
-    CheckBox consent;
+    CheckBox consent,bixby;
     TextView inspection,lastResult,serviceWarning;
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
@@ -21,7 +21,7 @@ public class SettingsActivity extends Activity {
             if(ZipService.instance!=null && ZipService.instance.running)ZipService.instance.stop(ResultStatus.CANCELLED);
             name.setText("dot");entry.setText("Dot");
             for(int i=0;i<fields.length;i++)fields[i].setText(CallSettings.OBSERVED_FOLD_LABELS[i]);
-            consent.setChecked(false);Toast.makeText(this,R.string.saved_disabled,Toast.LENGTH_LONG).show();
+            bixby.setChecked(true);consent.setChecked(false);Toast.makeText(this,R.string.saved_disabled,Toast.LENGTH_LONG).show();
         });
         TextView help=new TextView(this); help.setText(R.string.setup_help); box.addView(help);
         serviceWarning=new TextView(this);serviceWarning.setText(R.string.service_unavailable);box.addView(serviceWarning);
@@ -36,6 +36,8 @@ public class SettingsActivity extends Activity {
         entry=field(advanced,R.string.dot_entry,getSharedPreferences("shortcut",0).getString("dotEntry",""));entry.setId(106);
         int[] titles={R.string.composer,R.string.menu_label,R.string.sidebar_label,R.string.up_label,R.string.call_label,R.string.connected_label};
         for(int i=0;i<fields.length;i++) { fields[i]=field(advanced,titles[i],CallSettings.get(this,i)); fields[i].setId(100+i); }
+        bixby=new CheckBox(this);bixby.setId(202);bixby.setText(R.string.dismiss_bixby);
+        bixby.setChecked(getSharedPreferences("shortcut",0).getBoolean("dismissBixby",false));advanced.addView(bixby);
         consent=new CheckBox(this); consent.setId(200); consent.setText(R.string.consent);
         consent.setChecked(getSharedPreferences("shortcut",0).getBoolean("consent",false)); box.addView(consent);
         button(box,R.string.save,()->save());
@@ -57,6 +59,12 @@ public class SettingsActivity extends Activity {
             Intent chat=getPackageManager().getLaunchIntentForPackage("com.openai.chatgpt");
             if(chat==null) {Toast.makeText(this,R.string.missing_app,Toast.LENGTH_LONG).show();return;}
             ZipService.instance.inspectEntryOnce();startActivity(chat);
+        });
+        button(advanced,R.string.inspect_bixby,()-> {
+            if(ZipService.instance==null) {Toast.makeText(this,R.string.inspect_enable,Toast.LENGTH_LONG).show();return;}
+            Intent assistant=getPackageManager().getLaunchIntentForPackage(BixbyHandoff.PACKAGE);
+            if(assistant==null) {Toast.makeText(this,R.string.missing_bixby,Toast.LENGTH_LONG).show();return;}
+            ZipService.instance.inspectBixbyOnce();startActivity(assistant);
         });
         button(box,R.string.access,()->startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)));
         button(box,R.string.cancel,()-> { if(ZipService.instance!=null)ZipService.instance.stop(ResultStatus.CANCELLED);
@@ -92,6 +100,9 @@ public class SettingsActivity extends Activity {
         String[] values=new String[fields.length]; for(int i=0;i<fields.length;i++)values[i]=fields[i].getText().toString().trim();
         if(!CallSettings.store(this,name.getText().toString(),values,consent.isChecked(),entry.getText().toString())) {
             Toast.makeText(this,R.string.invalid,Toast.LENGTH_LONG).show(); return false;
+        }
+        if(!getSharedPreferences("shortcut",0).edit().putBoolean("dismissBixby",bixby.isChecked()).commit()) {
+            Toast.makeText(this,R.string.invalid,Toast.LENGTH_LONG).show();return false;
         }
         if(ZipService.instance!=null && ZipService.instance.running)ZipService.instance.stop(ResultStatus.CANCELLED);
         if(!consent.isChecked()) {

@@ -1,6 +1,6 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="local.zipshortcut" android:versionCode="16" android:versionName="1.4.9-dev">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="local.zipshortcut" android:versionCode="17" android:versionName="1.4.10-dev">
  <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="36" />
- <queries><package android:name="com.openai.chatgpt" /></queries>
+ <queries><package android:name="com.openai.chatgpt" /><package android:name="com.samsung.android.bixby.agent" /></queries>
  <application android:label="Voice to Dot" android:icon="@drawable/icon" android:theme="@android:style/Theme.Material.Light.NoActionBar" android:allowBackup="false">
   <activity android:name=".LauncherActivity" android:exported="true" android:launchMode="singleTask" />
   <activity-alias android:name=".MainActivity" android:targetActivity=".LauncherActivity" android:enabled="true" android:exported="true" android:label="Voice to Dot" android:icon="@drawable/icon">

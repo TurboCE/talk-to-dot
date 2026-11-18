@@ -21,11 +21,12 @@ public class ZipService extends AccessibilityService {
     final Runnable inspectTick=this::inspectStep;
     static String inspectionReport="";
     long inspectionDeadline, inspectedMenuAt;
-    boolean inspectMenuMode, inspectionMenuAttempted, inspectEntryMode, inspectionEntryAttempted;
+    boolean inspectMenuMode, inspectionMenuAttempted, inspectEntryMode, inspectionEntryAttempted, inspectBixbyMode, inspectionBixbyAttempted;
     long inspectedEntryAt;
     String inspectionTarget;
     boolean running, enteredTarget;
     CallPolicy policy;
+    final BixbyHandoff handoff=new BixbyHandoff();
     String targetName, targetEntry, lastAction="";
     String[] labels;
     long lastClick, unavailableSince=-1;
@@ -42,7 +43,7 @@ public class ZipService extends AccessibilityService {
         if(running)stop(ResultStatus.CANCELLED);
         CallSettings.clearRequest(prefs().edit()).commit();
         inspectionReport="";inspectionDeadline=SystemClock.elapsedRealtime()+10000;
-        inspectMenuMode=false;inspectionMenuAttempted=false;inspectEntryMode=false;inspectionEntryAttempted=false;
+        inspectMenuMode=false;inspectionMenuAttempted=false;inspectEntryMode=false;inspectionEntryAttempted=false;inspectBixbyMode=false;inspectionBixbyAttempted=false;handoff.reset();
         inspectedEntryAt=0;inspectedMenuAt=0;inspectionTarget="";
         handler.removeCallbacks(inspectTick);handler.postDelayed(inspectTick,0);
     }
@@ -51,6 +52,7 @@ public class ZipService extends AccessibilityService {
         inspectionTarget=name==null?"":name.trim();
         if(inspectionTarget.isEmpty() || inspectionTarget.length()>80)finishInspection("Invalid target; no action performed.");
     }
+    void inspectBixbyOnce() {inspectOnce();inspectBixbyMode=true;}
     void inspectEntryOnce() {inspectOnce();inspectEntryMode=true;inspectionTarget="Dot";}
     void finishInspection(String report) {
         inspectionReport=report;inspectionDeadline=0;
@@ -60,10 +62,11 @@ public class ZipService extends AccessibilityService {
         if(inspectionDeadline==0)return;
         long now=SystemClock.elapsedRealtime();
         if(now>=inspectionDeadline) {
-            inspectionReport=inspectEntryMode?"Entry-only inspection timed out; entry attempts="+(inspectionEntryAttempted?1:0)+"; no call dispatch.\n"+inspectionReport:inspectMenuMode?"Menu-only inspection timed out; menu attempts="+(inspectionMenuAttempted?1:0)+"; no call dispatch.\n"+inspectionReport:"Read-only inspection timed out; no actions.";
+            inspectionReport=inspectBixbyMode?"Bixby-only inspection timed out; Back attempts="+(inspectionBixbyAttempted?1:0)+"; no call dispatch.":inspectEntryMode?"Entry-only inspection timed out; entry attempts="+(inspectionEntryAttempted?1:0)+"; no call dispatch.\n"+inspectionReport:inspectMenuMode?"Menu-only inspection timed out; menu attempts="+(inspectionMenuAttempted?1:0)+"; no call dispatch.\n"+inspectionReport:"Read-only inspection timed out; no actions.";
             inspectionDeadline=0;Toast.makeText(this,R.string.inspect_timeout,Toast.LENGTH_LONG).show();return;
         }
         AccessibilityNodeInfo root=getRootInActiveWindow();
+        if(inspectBixbyMode) {inspectBixbyStep(root,now);return;}
         if(current(root)) {
             if(inspectEntryMode) {
                 inspectEntryStep(root,now);return;
@@ -90,6 +93,30 @@ public class ZipService extends AccessibilityService {
                     finishInspection(inspectionReport);return;
                 }
             } else {finishInspection(ScreenInspector.scan(root));return;}
+        }
+        handler.postDelayed(inspectTick,150);
+    }
+    void inspectBixbyStep(AccessibilityNodeInfo root,long now) {
+        if(locked()) {finishInspection("Locked; no Bixby or call action.");return;}
+        if(inspectionBixbyAttempted) {
+            if(root!=null && root.refresh() && !BixbyHandoff.bixby(root))
+                finishInspection("Bixby-only; Back attempts=1; Bixby no longer active; no call dispatch.");
+            else handler.postDelayed(inspectTick,150);
+            return;
+        }
+        if(root==null || !root.refresh()) {handoff.reset();handler.postDelayed(inspectTick,150);return;}
+        if(handoff.ready(root,now)) {
+            AccessibilityNodeInfo active=getRootInActiveWindow();
+            if(!BixbyHandoff.same(root,active) || !active.refresh() || !BixbyHandoff.same(root,active)) {
+                finishInspection("Bixby binding changed; no action.");return;
+            }
+            inspectionBixbyAttempted=true;
+            AccessibilityNodeInfo latest=getRootInActiveWindow();
+            if(!BixbyHandoff.same(active,latest) || !latest.refresh() || !BixbyHandoff.same(active,latest)
+                    || locked() || SystemClock.elapsedRealtime()>=inspectionDeadline) {
+                finishInspection("Bixby binding changed before action; no Back or call dispatch.");return;
+            }
+            if(!performGlobalAction(GLOBAL_ACTION_BACK)) {finishInspection("Bixby Back failed; no retry or call dispatch.");return;}
         }
         handler.postDelayed(inspectTick,150);
     }
@@ -129,6 +156,7 @@ public class ZipService extends AccessibilityService {
         for(int i=0;i<labels.length;i++)labels[i]=CallSettings.get(this,i);
         labels=CallSettings.resolved(labels,targetName);
         policy=new CallPolicy(prefs().getLong("startedAtElapsed",-1),attempted,prefs().getLong("attemptedAt",-1));
+        handoff.reset();
         running=true; enteredTarget=false; unavailableSince=-1; lastAction=""; lastClick=0;
         candidateWindow=-1; candidateBounds=null; schedule(0);
     }
@@ -141,7 +169,7 @@ public class ZipService extends AccessibilityService {
     }
     void resetEvidence() { policy.candidateSince=-1; policy.markerSince=-1; candidateWindow=-1; candidateBounds=null; }
     void unavailable(long now) {
-        resetEvidence();
+        handoff.reset();resetEvidence();
         if(unavailableSince<0)unavailableSince=now;
         if(enteredTarget && now-unavailableSince>=TREE_GRACE_MS) { stop(ResultStatus.CANCELLED); return; }
         schedule(150);
@@ -155,6 +183,7 @@ public class ZipService extends AccessibilityService {
         AccessibilityNodeInfo root=getRootInActiveWindow();
         // A missing/unrefreshable tree is not proof of app departure. Observe briefly without clicking.
         if(root==null || !root.refresh()) { unavailable(now); return; }
+        if(initialBixbyHandoff(root,now))return;
         if(!chatGpt(root)) {
             resetEvidence();
             if(enteredTarget || policy.attempted) { stop(ResultStatus.CANCELLED); return; }
@@ -206,6 +235,25 @@ public class ZipService extends AccessibilityService {
             }
         }
         if(running)schedule(150);
+    }
+    boolean initialBixbyHandoff(AccessibilityNodeInfo root,long now) {
+        if(enteredTarget || policy.attempted || !prefs().getBoolean("dismissBixby",false))return false;
+        if(!BixbyHandoff.bixby(root)){handoff.reset();return false;}
+        if(!prefs().getBoolean("bixbyDismissed",false) && handoff.ready(root,now)) {
+            AccessibilityNodeInfo active=getRootInActiveWindow();
+            if(!BixbyHandoff.same(root,active) || !active.refresh()) {handoff.reset();schedule(150);return true;}
+            // Reserve before a system action; a failed/unknown Back can never be retried by this request.
+            if(!prefs().edit().putBoolean("bixbyDismissed",true).commit()) {stop(ResultStatus.CANCELLED);return true;}
+            AccessibilityNodeInfo latest=getRootInActiveWindow();
+            if(!BixbyHandoff.same(active,latest) || !latest.refresh() || !BixbyHandoff.same(active,latest)
+                    || locked() || !armed() || policy.expired(SystemClock.elapsedRealtime()) || !prefs().getBoolean("consent",false)
+                    || !prefs().getBoolean("dismissBixby",false)) {
+                stop(ResultStatus.CANCELLED);return true;
+            }
+            performGlobalAction(GLOBAL_ACTION_BACK);
+        }
+        // Wait for a real ChatGPT active root. Never click through the assistant overlay.
+        schedule(150);return true;
     }
     boolean navigationAllowed(AccessibilityNodeInfo previous,AccessibilityNodeInfo target,String expectedLabel) {
         AccessibilityNodeInfo active=getRootInActiveWindow();

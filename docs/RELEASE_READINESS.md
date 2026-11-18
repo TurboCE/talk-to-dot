@@ -1,11 +1,11 @@
 # Release readiness — Voice to Dots
 
-Current local source/build: **1.4.9-dev / versionCode 16**; device trial used **1.4.6-dev / versionCode 13**. The identified Samsung SM-F966N passed the non-call service probes with the unchanged core service in 1.4.5-dev; the later patch refreshes the stable outcome on setup resume. The final same-signature update succeeded and all eight prepared fields plus call authorization OFF were reverified. This remains an MIT fork of Talk to Dot; stable publication is blocked by the acceptance items below. The published 1.4.0 prerelease predates the safety fixes and is not the current build.
+Current local source/build: **1.4.10-dev / versionCode 17**; device trial used **1.4.6-dev / versionCode 13**. The identified Samsung SM-F966N passed the non-call service probes with the unchanged core service in 1.4.5-dev; the later patch refreshes the stable outcome on setup resume. The final same-signature update succeeded and all eight prepared fields plus call authorization OFF were reverified. This remains an MIT fork of Talk to Dot; stable publication is blocked by the acceptance items below. The published 1.4.0 prerelease predates the safety fixes and is not the current build.
 
 ## Completed
 
 - Safety corrections: refreshed label/identity/window/bounds validation; one-attempt reservation; restart cancellation; missing-tree grace; resolved-label collisions; authorization revocation; structural state evidence; stable result names; ambiguous-state cancellation.
-- **370 non-device assertions**: 27 call-policy, 31 baseline service, 123 safety regression, 39 compact-owner/inspection, 33 menu-only and 50 native drawer/entry/navigation and 67 actual-launcher checks. Manifest/privacy/locale/MIT checks pass. Every APK build now runs these gates before packaging, including the inherited CI build entrypoint.
+- **443 non-device assertions**: 27 call-policy, 31 baseline service, 123 safety regression, 39 compact-owner/inspection, 33 menu-only and 50 native drawer/entry/navigation and 67 actual-launcher and 73 optional-Bixby-handoff checks. Manifest/privacy/locale/MIT checks pass. Every APK build now runs these gates before packaging, including the inherited CI build entrypoint.
 - Local JDK 17 / Android 36 / build tools 36.1.0 compilation, D8, packaging, alignment and APK v2/v3 signature verification pass. Runtime minimum API 26, target 36; device Android 17 / API 37, ChatGPT 1.2026.314.
 - Actual service recognizes normal-screen menu/call owners and paired input label. It opened the menu once and recognized the exact native four-child Dot row with unique Korean drawer anchors.
 - Actual entry-only service test dispatched exactly one action to that verified native Dot row and observed the normal Dot input/menu/call controls. It contains no call dispatch.
@@ -59,3 +59,13 @@ The code16 update is installed, the corrected Up field and calls OFF were reveri
 ## Corrected routine reaches call screen
 
 A fresh, preannounced code16 routine trial selected its saved Start exactly once after clearing the previous result. The utility reported configured-call-screen detection, and provider microphone metadata showed a new running session at roughly 19 and 35 seconds. No direct app or ChatGPT call-button ADB launch was used. The phone was returned to that existing call screen for owner audio confirmation and termination. Audio/termination feedback is pending; the utility's authorization is ON during this coordinated trial. Do not infer a new or current outcome from older trial records. Voice-command triggering, physical layouts, remaining safety acceptance and release signing are still open.
+
+## User Bixby test and bounded handoff correction
+
+The owner reported the Korean phrase was not recognized and English routine invocation opened Dot without voice. Activity logs confirmed Routines → utility → ChatGPT. Its Bixby response panel remained over Dot; private screen contents are not published. No fresh provider microphone use was observed. This did not pass the spoken-command acceptance gate.
+
+The created routine is now **닷 음성 실행**, preserving its manual trigger and sole Voice to Dot Open action. A temporary host UI test jar set and verified only its name EditText; no keyboard app was installed or system keyboard setting changed. The jar was removed. The Bixby package/public launcher and accessible root were verified on device.
+
+Code17 adds an optional initial exact-package, stable-window, once-only Back with persisted reservation and dispatch-time checks. It cannot dismiss other apps or overlays arriving after ChatGPT was observed. A separate explicitly selected Bixby-only diagnostic clears call requests and never arms/clicks a call. The keyboard-open probe consumed one Back without exiting and did not retry. The subsequent keyboard-hidden probe returned to setup and reported **Back attempts=1; Bixby no longer active; no call dispatch**. Provider microphone metadata was unchanged.
+
+Code17 is installed, observed profile applied, Bixby handoff ON, call authorization OFF. Full speech-triggered testing needs a new advance announcement; none was attempted during this correction.
