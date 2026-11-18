@@ -65,3 +65,9 @@ The announced routine trial stopped before any routine Start action when preflig
 The owner explicitly asked the agent to perform the recovery. Only the utility's main service control was toggled off and on in Android Accessibility → Installed apps → Voice to Dot. Actual connection was then verified in the complete **multiline Bound services section**, not by the Enabled services list or a single-line match. The setup warning disappeared. The floating Accessibility Button assignment remained absent and authorization remained OFF. Last result showed cancelled. Provider microphone app-ops retained the old completed duration; no new call or routine Start occurred. Existing non-floating hardware shortcuts and other services were preserved.
 
 Runtime source 712da62 passed [CI 44356586143](https://github.com/TurboCE/talk-to-dot/actions/runs/44356586143); the local full suite passed 363 assertions and the APK v2/v3 signature checks. Samsung routine execution and audio feedback are still pending.
+
+## Single saved-routine attempt and work-conversation exit
+
+The agent selected **Voice to Dot 시작** exactly once in Samsung Routines, without directly launching the utility or clicking a ChatGPT call control. The pretrial app result was cancelled. ChatGPT became foreground; after 35 seconds the saved result was pre-call timeout, and the microphone record retained its previous completed duration. This is a failed full-flow trial, not successful voice initiation.
+
+A subsequent no-click service probe recognized a non-Dot work input and the actionable **상위 화면으로 이동** control. No work title/input identifier is included in public evidence. The observed optional Up setting was blank. A single structurally checked ADB action on that Up control returned to a screen with one **메뉴** control; it did not start a call. The 1.4.9-dev observed preset now includes the exact Korean Up label; synthetic regression checks pass. No further live call was attempted.

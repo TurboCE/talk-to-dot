@@ -29,7 +29,7 @@ final class CallSettings {
         return !target.equals(values[1]) && !target.equals(values[4]) && !target.equals(values[5])
                 && (values[3].isEmpty() || !target.equals(values[3]));
     }
-    static final String[] OBSERVED_FOLD_LABELS={"내 {dot}에게 메시지 보내기","메뉴","Dot","","통화","종료"};
+    static final String[] OBSERVED_FOLD_LABELS={"내 {dot}에게 메시지 보내기","메뉴","Dot","상위 화면으로 이동","통화","종료"};
     static boolean applyObservedFoldProfile(Context c) {return store(c,"dot",OBSERVED_FOLD_LABELS,false,"Dot");}
     static boolean configured(Context c) {
         String[] v=new String[KEYS.length]; for(int i=0;i<v.length;i++)v[i]=get(c,i);

@@ -61,6 +61,16 @@ public final class NativeNavigationTest {
         SystemClock.now=800;s.step();check(call.clicks==1);
         s.root=view().add(FoldControlResolverTest.control("종료",4));SystemClock.now=900;s.step();SystemClock.now=1400;s.step();
         check(!s.running);check(s.preferences.getString("lastResult","").equals(ResultStatus.CONFIRMED));
+        // Observed work-thread exit label is navigation only; an unrelated editable input is not Dot.
+        s=service();s.labels[3]="상위 화면으로 이동";
+        AccessibilityNodeInfo up=FoldControlResolverTest.control("상위 화면으로 이동",4);
+        s.root=view().add(FoldControlResolverTest.inputContainer("unrelated work input")).add(up);
+        s.step();check(up.clicks==1);check(!s.policy.attempted);
+        s.root=view().add(FoldControlResolverTest.inputContainer(MenuInspector.COMPOSER)).add(FoldControlResolverTest.control("통화",4));
+        call=s.root.getChild(1);SystemClock.now=200;s.step();check(call.clicks==0);SystemClock.now=700;s.step();check(call.clicks==1);
+        s=service();s.labels[3]="상위 화면으로 이동";up=FoldControlResolverTest.control("상위 화면으로 이동",4);
+        s.root=view().add(up).add(FoldControlResolverTest.control("상위 화면으로 이동",4));s.step();check(up.clicks==0);check(!s.policy.attempted);
+        check(CallSettings.OBSERVED_FOLD_LABELS[3].equals("상위 화면으로 이동"));
         System.out.println("PASS "+checks+" native drawer/entry-only checks (observed four-child shape; synthetic runtime)");
     }
 }

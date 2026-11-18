@@ -1,11 +1,11 @@
 # Release readiness — Voice to Dots
 
-Current local source/build: **1.4.8-dev / versionCode 15**; device trial used **1.4.6-dev / versionCode 13**. The identified Samsung SM-F966N passed the non-call service probes with the unchanged core service in 1.4.5-dev; the later patch refreshes the stable outcome on setup resume. The final same-signature update succeeded and all eight prepared fields plus call authorization OFF were reverified. This remains an MIT fork of Talk to Dot; stable publication is blocked by the acceptance items below. The published 1.4.0 prerelease predates the safety fixes and is not the current build.
+Current local source/build: **1.4.9-dev / versionCode 16**; device trial used **1.4.6-dev / versionCode 13**. The identified Samsung SM-F966N passed the non-call service probes with the unchanged core service in 1.4.5-dev; the later patch refreshes the stable outcome on setup resume. The final same-signature update succeeded and all eight prepared fields plus call authorization OFF were reverified. This remains an MIT fork of Talk to Dot; stable publication is blocked by the acceptance items below. The published 1.4.0 prerelease predates the safety fixes and is not the current build.
 
 ## Completed
 
 - Safety corrections: refreshed label/identity/window/bounds validation; one-attempt reservation; restart cancellation; missing-tree grace; resolved-label collisions; authorization revocation; structural state evidence; stable result names; ambiguous-state cancellation.
-- **363 non-device assertions**: 27 call-policy, 31 baseline service, 123 safety regression, 39 compact-owner/inspection, 33 menu-only and 43 native drawer/entry and 67 actual-launcher checks. Manifest/privacy/locale/MIT checks pass. Every APK build now runs these gates before packaging, including the inherited CI build entrypoint.
+- **370 non-device assertions**: 27 call-policy, 31 baseline service, 123 safety regression, 39 compact-owner/inspection, 33 menu-only and 50 native drawer/entry/navigation and 67 actual-launcher checks. Manifest/privacy/locale/MIT checks pass. Every APK build now runs these gates before packaging, including the inherited CI build entrypoint.
 - Local JDK 17 / Android 36 / build tools 36.1.0 compilation, D8, packaging, alignment and APK v2/v3 signature verification pass. Runtime minimum API 26, target 36; device Android 17 / API 37, ChatGPT 1.2026.314.
 - Actual service recognizes normal-screen menu/call owners and paired input label. It opened the menu once and recognized the exact native four-child Dot row with unique Korean drawer anchors.
 - Actual entry-only service test dispatched exactly one action to that verified native Dot row and observed the normal Dot input/menu/call controls. It contains no call dispatch.
@@ -23,7 +23,7 @@ Current local source/build: **1.4.8-dev / versionCode 15**; device trial used **
 | Dot input template | `내 {dot}에게 메시지 보내기` |
 | Menu | `메뉴` |
 | Native drawer marker | `Dot` |
-| Optional alternate/up control | empty |
+| Optional alternate/up control | `상위 화면으로 이동` |
 | Call | `통화` |
 | End-call screen marker | `종료` |
 
@@ -47,3 +47,9 @@ Only the review branch / draft PR is published. Main and APK releases remain unc
 A new manual routine named **Voice to Dot** was saved with exactly one action: Voice to Dot Open. Existing routines were not edited. No routine start was dispatched: initial connectivity failed, and the later pretrial checks found the service enabled but disconnected/in Android's Crashed services list. An old confirmed result was therefore not accepted as new success. The routine execution and voice-trigger acceptance gates remain open.
 
 The floating grey microphone was Android's Accessibility Button shortcut assigned to this utility, not a utility-created overlay or the system microphone privacy indicator. Only its Voice to Dot button assignment was unchecked; service access remained enabled. No other shortcut targets or apps were changed. A no-call service-readiness fix is in 1.4.8-dev; After the owner explicitly requested agent operation, the agent toggled only this service off/on. Actual multiline Bound services evidence and the hidden setup warning confirmed recovery; the floating button remains unassigned and automatic-call authorization is OFF. The latest code15 APK is installed. Runtime [712da62 CI](https://github.com/TurboCE/talk-to-dot/actions/runs/44356586143) passed; no release job ran.
+
+## First saved-routine execution
+
+After service recovery, the saved Samsung routine's Start control was selected exactly once. It opened ChatGPT, but the utility timed out **before attempting the call**; provider microphone usage did not change. Pretrial cancelled status was explicitly checked, so the older confirmed result was not reused as evidence. No automatic retry occurred.
+
+The read-only service probe showed the provider was in a work conversation with a verified **상위 화면으로 이동** control, rather than the Dot composer. Its input contents and work identifiers are not recorded here. The saved Up label had been empty. One separately validated, non-call ADB Up action returned to a screen with **메뉴**; that navigation was not an app-originated call test. The observed-profile preset now includes this exact Up label. Seven additional synthetic checks cover the Korean fallback path, separation of unrelated input from Dot, stable call gating after navigation, and duplicate-Up rejection. The corrected routine must still be tested after a fresh announcement; it is not claimed successful.
