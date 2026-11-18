@@ -1,6 +1,6 @@
 # Release readiness — Voice to Dots
 
-Current development runtime: **1.4.5-dev / versionCode 12**, installed on the identified Samsung SM-F966N. This remains an MIT fork of Talk to Dot; stable publication is blocked by the acceptance items below. The published 1.4.0 prerelease predates the safety fixes and is not the current build.
+Current source/build: **1.4.6-dev / versionCode 13**. The identified Samsung SM-F966N last received **1.4.5-dev / code 12**, which passed the non-call service probes. The later patch refreshes the stable outcome on setup resume; it has not been installed because the target disconnected. This remains an MIT fork of Talk to Dot; stable publication is blocked by the acceptance items below. The published 1.4.0 prerelease predates the safety fixes and is not the current build.
 
 ## Completed
 
@@ -33,7 +33,7 @@ Only the observed Korean ChatGPT structure is established. English setup resourc
 2. Verify natural startup/return/cold navigation, missing-label timeout, repeated invocation, app departure/interruption, authorization revocation and locked-device refusal. Synthetic tests remain the only evidence for scenarios the real provider cannot safely reproduce, such as duplicate controls.
 3. Establish physical folded/unfolded behavior with the owner. Display dimensions alone are not proof of state. Verify any persistent side-pane behavior before claiming both layouts work.
 4. Verify the exact Bixby/Routines launch-app action actually available on the device. Owner handles any system permission/settings changes. The utility does not unlock the phone.
-5. Verify the CI run for the exact source revision. Do not report queued or absent CI as passed. CI development keys may differ; do not install an unrelated CI-signed APK over the retained local key.
+5. Verify CI for the final source revision. The [2105b5c build and regression run](https://github.com/TurboCE/talk-to-dot/actions/runs/44346450085) passed; later UI-only source still requires its own run. Do not report queued or absent CI as passed. CI development keys may differ; do not install an unrelated CI-signed APK over the retained local key.
 6. Finalize and retain the release signing identity/backup and a data-preserving update plan. Do not silently uninstall the existing test app to change keys. Reverify final artifact integrity, privacy disclosures and version before stable publication.
 
 ## Publication and device boundaries

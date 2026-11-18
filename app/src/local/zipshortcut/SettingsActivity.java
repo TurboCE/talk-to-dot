@@ -10,7 +10,7 @@ public class SettingsActivity extends Activity {
     EditText[] fields=new EditText[CallSettings.KEYS.length];
     CheckBox consent;
     Spinner icons;
-    TextView inspection;
+    TextView inspection,lastResult;
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
         ScrollView scroll=new ScrollView(this); scroll.setFitsSystemWindows(true);
@@ -25,8 +25,7 @@ public class SettingsActivity extends Activity {
             consent.setChecked(false);Toast.makeText(this,R.string.saved_disabled,Toast.LENGTH_LONG).show();
         });
         TextView help=new TextView(this); help.setText(R.string.setup_help); box.addView(help);
-        int status=ResultStatus.message(getSharedPreferences("shortcut",0).getString("lastResult",""));
-        if(status!=0) { TextView result=new TextView(this); result.setText(getString(R.string.last_result)+" "+getString(status)); box.addView(result); }
+        lastResult=new TextView(this);box.addView(lastResult);
         inspection=new TextView(this);inspection.setContentDescription(getString(R.string.inspect_report));
         inspection.setTextIsSelectable(true);box.addView(inspection);
         name=field(box,R.string.dot_name,DotSettings.name(this)); name.setId(99);
@@ -67,6 +66,11 @@ public class SettingsActivity extends Activity {
     }
     @Override protected void onResume() {
         super.onResume();
+        if(lastResult!=null) {
+            int status=ResultStatus.message(getSharedPreferences("shortcut",0).getString("lastResult",""));
+            lastResult.setText(status==0?"":getString(R.string.last_result)+" "+getString(status));
+            lastResult.setVisibility(status==0?android.view.View.GONE:android.view.View.VISIBLE);
+        }
         if(inspection!=null) {
             inspection.setText(ZipService.inspectionReport);
             inspection.setVisibility(ZipService.inspectionReport.isEmpty()?android.view.View.GONE:android.view.View.VISIBLE);
