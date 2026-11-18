@@ -56,7 +56,7 @@ final class ScreenInspector {
     }
     static int targetControls(AccessibilityNodeInfo n,String name) {
         if(n==null)return 0;
-        int count=ControlResolver.control(n,name,true)?1:0;
+        int count=NativeNavigation.evidence(n,name)==NativeNavigation.VERIFIED?1:0;
         for(int i=0;i<n.getChildCount();i++)count+=targetControls(n.getChild(i),name);
         return count;
     }
@@ -73,9 +73,10 @@ final class ScreenInspector {
             report.append("target label class=").append(n.getClassName()).append("; clickOwnerDepth=").append(depth);
             if(owner!=null && owner.isClickable()) {
                 report.append("; owner=").append(owner.getClassName()).append("; children=").append(owner.getChildCount())
-                        .append("; verifiedRole=").append(ControlResolver.control(owner,name,true));
+                        .append("; verifiedRole=").append(NativeNavigation.evidence(owner,name)==NativeNavigation.VERIFIED);
             } else report.append("; no bounded click owner");
             report.append('\n');
+            if(owner!=null && owner.getChildCount()==4)report.append(NativeNavigation.explain(owner,name)).append('\n');
         }
         for(int i=0;i<n.getChildCount();i++)targetNodes(n.getChild(i),name,report,seen);
     }

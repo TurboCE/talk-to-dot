@@ -17,6 +17,13 @@ public class SettingsActivity extends Activity {
         LinearLayout box=new LinearLayout(this); box.setOrientation(1);
         int pad=(int)(24*getResources().getDisplayMetrics().density); box.setPadding(pad,pad,pad,pad);
         TextView title=new TextView(this); title.setText(R.string.configure_dot); title.setTextSize(26); box.addView(title);
+        button(box,R.string.apply_fold_profile,()-> {
+            if(!CallSettings.applyObservedFoldProfile(this)) {Toast.makeText(this,R.string.invalid,Toast.LENGTH_LONG).show();return;}
+            if(ZipService.instance!=null && ZipService.instance.running)ZipService.instance.stop(ResultStatus.CANCELLED);
+            name.setText("dot");entry.setText("Dot");
+            for(int i=0;i<fields.length;i++)fields[i].setText(CallSettings.OBSERVED_FOLD_LABELS[i]);
+            consent.setChecked(false);Toast.makeText(this,R.string.saved_disabled,Toast.LENGTH_LONG).show();
+        });
         TextView help=new TextView(this); help.setText(R.string.setup_help); box.addView(help);
         int status=ResultStatus.message(getSharedPreferences("shortcut",0).getString("lastResult",""));
         if(status!=0) { TextView result=new TextView(this); result.setText(getString(R.string.last_result)+" "+getString(status)); box.addView(result); }
@@ -46,6 +53,12 @@ public class SettingsActivity extends Activity {
             Intent chat=getPackageManager().getLaunchIntentForPackage("com.openai.chatgpt");
             if(chat==null) {Toast.makeText(this,R.string.missing_app,Toast.LENGTH_LONG).show();return;}
             ZipService.instance.inspectMenuOnce(entry.getText().toString().trim().isEmpty()?name.getText().toString():entry.getText().toString());startActivity(chat);
+        });
+        button(box,R.string.inspect_entry,()-> {
+            if(ZipService.instance==null) {Toast.makeText(this,R.string.inspect_enable,Toast.LENGTH_LONG).show();return;}
+            Intent chat=getPackageManager().getLaunchIntentForPackage("com.openai.chatgpt");
+            if(chat==null) {Toast.makeText(this,R.string.missing_app,Toast.LENGTH_LONG).show();return;}
+            ZipService.instance.inspectEntryOnce();startActivity(chat);
         });
         button(box,R.string.access,()->startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)));
         button(box,R.string.cancel,()-> { if(ZipService.instance!=null)ZipService.instance.stop(ResultStatus.CANCELLED);

@@ -21,7 +21,8 @@ public class ZipService extends AccessibilityService {
     final Runnable inspectTick=this::inspectStep;
     static String inspectionReport="";
     long inspectionDeadline, inspectedMenuAt;
-    boolean inspectMenuMode, inspectionMenuAttempted;
+    boolean inspectMenuMode, inspectionMenuAttempted, inspectEntryMode, inspectionEntryAttempted;
+    long inspectedEntryAt;
     String inspectionTarget;
     boolean running, enteredTarget;
     CallPolicy policy;
@@ -41,7 +42,8 @@ public class ZipService extends AccessibilityService {
         if(running)stop(ResultStatus.CANCELLED);
         CallSettings.clearRequest(prefs().edit()).commit();
         inspectionReport="";inspectionDeadline=SystemClock.elapsedRealtime()+10000;
-        inspectMenuMode=false;inspectionMenuAttempted=false;inspectedMenuAt=0;inspectionTarget="";
+        inspectMenuMode=false;inspectionMenuAttempted=false;inspectEntryMode=false;inspectionEntryAttempted=false;
+        inspectedEntryAt=0;inspectedMenuAt=0;inspectionTarget="";
         handler.removeCallbacks(inspectTick);handler.postDelayed(inspectTick,0);
     }
     void inspectMenuOnce(String name) {
@@ -49,19 +51,23 @@ public class ZipService extends AccessibilityService {
         inspectionTarget=name==null?"":name.trim();
         if(inspectionTarget.isEmpty() || inspectionTarget.length()>80)finishInspection("Invalid target; no action performed.");
     }
+    void inspectEntryOnce() {inspectOnce();inspectEntryMode=true;inspectionTarget="Dot";}
     void finishInspection(String report) {
         inspectionReport=report;inspectionDeadline=0;
-        Toast.makeText(this,inspectMenuMode?R.string.inspect_menu_done:R.string.inspect_done,Toast.LENGTH_LONG).show();
+        Toast.makeText(this,(inspectMenuMode || inspectEntryMode)?R.string.inspect_menu_done:R.string.inspect_done,Toast.LENGTH_LONG).show();
     }
     void inspectStep() {
         if(inspectionDeadline==0)return;
         long now=SystemClock.elapsedRealtime();
         if(now>=inspectionDeadline) {
-            inspectionReport=inspectMenuMode?"Menu-only inspection timed out; menu attempts="+(inspectionMenuAttempted?1:0)+"; no call dispatch.\n"+inspectionReport:"Read-only inspection timed out; no actions.";
+            inspectionReport=inspectEntryMode?"Entry-only inspection timed out; entry attempts="+(inspectionEntryAttempted?1:0)+"; no call dispatch.\n"+inspectionReport:inspectMenuMode?"Menu-only inspection timed out; menu attempts="+(inspectionMenuAttempted?1:0)+"; no call dispatch.\n"+inspectionReport:"Read-only inspection timed out; no actions.";
             inspectionDeadline=0;Toast.makeText(this,R.string.inspect_timeout,Toast.LENGTH_LONG).show();return;
         }
         AccessibilityNodeInfo root=getRootInActiveWindow();
         if(current(root)) {
+            if(inspectEntryMode) {
+                inspectEntryStep(root,now);return;
+            }
             if(inspectMenuMode && !inspectionMenuAttempted) {
                 AccessibilityNodeInfo menu=MenuInspector.candidate(root);
                 if(menu==null && ScreenInspector.targetLabels(root,inspectionTarget)>0) {
@@ -84,6 +90,25 @@ public class ZipService extends AccessibilityService {
                     finishInspection(inspectionReport);return;
                 }
             } else {finishInspection(ScreenInspector.scan(root));return;}
+        }
+        handler.postDelayed(inspectTick,150);
+    }
+    void inspectEntryStep(AccessibilityNodeInfo root,long now) {
+        if(!inspectionEntryAttempted) {
+            AccessibilityNodeInfo entry=NativeNavigation.dotEntry(root);
+            if(entry!=null) {
+                AccessibilityNodeInfo active=getRootInActiveWindow();
+                if(!entry.refresh() || !current(active) || locked() || NativeNavigation.rowEvidence(entry,"Dot")!=NativeNavigation.VERIFIED
+                        || !entry.equals(NativeNavigation.dotEntry(active))) {
+                    finishInspection("Entry binding changed; no action performed.");return;
+                }
+                inspectionEntryAttempted=true;inspectedEntryAt=now;
+                if(!entry.performAction(AccessibilityNodeInfo.ACTION_CLICK)) {finishInspection("Entry action failed; no retry and no call dispatch.");return;}
+                handler.postDelayed(inspectTick,300);return;
+            }
+            inspectionReport=ScreenInspector.targetSummary(root,"Dot");
+        } else if(now-inspectedEntryAt>=300 && MenuInspector.candidate(root)!=null) {
+            finishInspection("Dot-entry-only; entry attempts=1; no call dispatch.\n"+ScreenInspector.scan(root));return;
         }
         handler.postDelayed(inspectTick,150);
     }
@@ -150,6 +175,7 @@ public class ZipService extends AccessibilityService {
             schedule(150); return;
         }
         if(marker) { stop(ResultStatus.ALREADY); return; }
+        if(composer && !sidebar && NativeNavigation.drawerEvidence(root)!=NativeNavigation.NONE) {stop(ResultStatus.AMBIGUOUS);return;}
         boolean destination=composer && !sidebar;
         AccessibilityNodeInfo call=destination?callControl(root):null;
         Rect bounds=new Rect(); if(call!=null)call.getBoundsInScreen(bounds);
@@ -170,9 +196,9 @@ public class ZipService extends AccessibilityService {
             }
         } else if(!destination) {
             String action=sidebar?"dot":"menu", expectedLabel=sidebar?targetEntry:labels[1];
-            AccessibilityNodeInfo target=directControl(root,expectedLabel,true);
+            AccessibilityNodeInfo target=NativeNavigation.unique(root,expectedLabel);
             if(target==null && !sidebar && !labels[3].isEmpty()) {
-                expectedLabel=labels[3];target=directControl(root,expectedLabel,true);action="up";
+                expectedLabel=labels[3];target=NativeNavigation.unique(root,expectedLabel);action="up";
             }
             if(!sidebar && lastAction.equals("dot") && now-lastClick<4000) { schedule(150); return; }
             if(target!=null && (!action.equals(lastAction) || now-lastClick>=1000) && navigationAllowed(root,target,expectedLabel)) {
@@ -188,11 +214,11 @@ public class ZipService extends AccessibilityService {
         if(stateCount(active,labels[5])>0) { stop(ResultStatus.ALREADY); return false; }
         if(expectedLabel.equals(labels[4]) || expectedLabel.equals(labels[5]))return false;
         if(policy.expired(SystemClock.elapsedRealtime()) || locked() || active.getWindowId()!=previous.getWindowId()
-                || !target.equals(directControl(active,expectedLabel,true)) || !target.refresh())return false;
+                || !target.equals(NativeNavigation.unique(active,expectedLabel)) || !target.refresh())return false;
         AccessibilityNodeInfo latest=getRootInActiveWindow();
         return current(latest) && latest.getWindowId()==previous.getWindowId() && !ambiguousState(latest)
-                && stateCount(latest,labels[5])==0 && target.equals(directControl(latest,expectedLabel,true))
-                && ControlResolver.control(target,expectedLabel,true) && chatGpt(target)
+                && stateCount(latest,labels[5])==0 && target.equals(NativeNavigation.unique(latest,expectedLabel))
+                && NativeNavigation.evidence(target,expectedLabel)==NativeNavigation.VERIFIED && chatGpt(target)
                 && target.getWindowId()==latest.getWindowId() && !locked() && !policy.expired(SystemClock.elapsedRealtime());
     }
     boolean locked() {
@@ -202,7 +228,7 @@ public class ZipService extends AccessibilityService {
     AccessibilityNodeInfo dispatchCandidate(AccessibilityNodeInfo expected,Rect bounds,int window) {
         if(expected==null || locked() || !prefs().getBoolean("consent",false))return null;
         AccessibilityNodeInfo root=getRootInActiveWindow();
-        if(!current(root) || root.getWindowId()!=window || destination(root)==null
+        if(!current(root) || root.getWindowId()!=window || destination(root)==null || NativeNavigation.drawerEvidence(root)!=NativeNavigation.NONE
                 || !statesClearForCall(root))return null;
         AccessibilityNodeInfo call=callControl(root);
         if(call==null || !call.equals(expected) || !call.refresh())return null;
@@ -210,7 +236,7 @@ public class ZipService extends AccessibilityService {
         // refresh() can change label, window, package, bounds and actionability: check all of them AFTER it.
         if(!callLabel(call) || !chatGpt(call) || call.getWindowId()!=window || !bounds.equals(refreshedBounds))return null;
         AccessibilityNodeInfo active=getRootInActiveWindow();
-        if(!current(active) || active.getWindowId()!=window || destination(active)==null
+        if(!current(active) || active.getWindowId()!=window || destination(active)==null || NativeNavigation.drawerEvidence(active)!=NativeNavigation.NONE
                 || !statesClearForCall(active))return null;
         AccessibilityNodeInfo finalCall=callControl(active);
         if(finalCall==null || !finalCall.equals(call) || !callLabel(finalCall) || !chatGpt(finalCall)
@@ -242,6 +268,7 @@ public class ZipService extends AccessibilityService {
     AccessibilityNodeInfo callControl(AccessibilityNodeInfo root) { return directControl(root,labels[4],true); }
     int stateCount(AccessibilityNodeInfo root,String label) {
         if(label.isEmpty())return 0;
+        if(label.equals(labels[2]))return NativeNavigation.match(root,label,false).state();
         List<AccessibilityNodeInfo> found=new ArrayList<>();collectControls(root,label,true,found);
         return found.size(); // Saturated at two: absent, unique, or ambiguous.
     }

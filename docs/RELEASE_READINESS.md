@@ -1,11 +1,11 @@
 # Release readiness — Voice to Dots
 
-Current source: 1.4.4-dev, versionCode 11 (built locally; the device last received 1.4.3-dev / code 10). This is still an independent MIT fork of Talk to Dot. The published 1.4.0 prerelease predates safety review fixes and must not be presented as the fixed build.
+Current source: 1.4.5-dev, versionCode 12, built and installed on the identified Fold7. This is still an independent MIT fork of Talk to Dot. The published 1.4.0 prerelease predates safety review fixes and must not be presented as the fixed build.
 
 ## Completed
 
 - Fixes for refreshed control identity/label, process/reconnect cancellation, missing-tree grace, resolved-label collisions, authorization revocation, structural state evidence, stable persisted outcomes and ambiguous duplicate state controls.
-- 27 policy, 31 baseline service, 123 safety regression, 39 observed-layout/inspection and 33 menu-only assertions pass; manifest permission/backup/scope and locale parity checks pass.
+- 27 policy, 31 baseline service, 123 safety regression, 39 observed-layout/inspection, 33 menu-only and 43 native drawer/entry assertions pass; manifest permission/backup/scope and locale parity checks pass.
 - Complete app compilation and signed APK build on the designated MacBook with JDK 17 / Android 36 / build tools 36.1.0. Zip alignment and APK v2/v3 signature verified. Current build is development signed.
 - No phone data erased, package removed, Accessibility service enabled or unrelated Android device operated on.
 
@@ -31,3 +31,11 @@ No calls were made during the subsequent menu/setup preparation. A menu-only dia
 The menu probe was requested and a native MainActivity navigation screen was observed, but its temporary final attempt/result report could not be read from the scrolled setup UI. Do not count semantic menu execution as fully validated on that evidence alone. 1.4.4-dev improves report focus and unknown-ownership metadata for the next inspection.
 
 Fold7 then disappeared from both USB and mDNS inventory. Reconnection to the last confirmed endpoint `192.168.0.74:42319` was refused. Only the unrelated recovery device remains visible, and it was not operated on. Obtain the current **Wireless debugging IP address and connection port** (not the pairing-code port), then reconnect with the existing pairing identity if still authorized. No further live call is authorized without a new advance readiness announcement.
+
+## Reconnected target and successful non-call navigation
+
+Existing pairing automatically reconnected the same SM-F966N / matching serial at `192.168.0.74:39131`; the newly supplied pairing code was not used. The complete four-child native Dot row was inspected, including an empty trailing decoration that can have zero or one empty leaf. The selector now requires that exact role/label/icon structure and unique observed `새 채팅` / `검색` drawer anchors. Unknown or duplicated evidence fails closed.
+
+The final 1.4.5-dev build installed without data clearing. The observed profile preset was applied; all eight configuration fields matched expectations and call authorization was checked OFF. A real menu-only service probe reported **Menu attempts=1**, **recognizedTargetControls=1**, **verifiedRole=true**. A separate fixed-entry-only probe reported **entry attempts=1; no call dispatch**, then the normal Dot input plus menu/call controls. This validates semantic menu opening and native entry selection through the actual service, not an integrated live call.
+
+Next gate: announce and coordinate exactly one app-originated live-call test, explicitly enable the app's call authorization, invoke its launcher once, and verify the app's stable outcome plus user-confirmed audio. No such call was started during this preparation. Routine/Bixby, both physical Fold layouts and remaining device safety acceptance still gate stable publication. Main and the published 1.4.0 preview have not been replaced.

@@ -37,7 +37,9 @@
  <string name="inspect_done">누르지 않고 컨트롤을 진단했습니다. 설정으로 돌아오면 임시 결과를 볼 수 있습니다.</string>
  <string name="inspect_timeout">진단 시간이 초과됐습니다. 버튼을 누르거나 통화하지 않았습니다.</string>
  <string name="inspect_menu">메뉴만 열고 진단 (통화하지 않음)</string>
- <string name="inspect_menu_done">메뉴 전용 진단을 마쳤습니다. 통화는 실행하지 않았습니다. 설정에서 임시 결과를 확인하세요.</string>
+ <string name="inspect_menu_done">통화 없는 탐색 진단을 마쳤습니다. 통화는 실행하지 않았습니다. 설정에서 임시 결과를 확인하세요.</string>
  <string name="saved_disabled">확인한 설정을 저장했습니다. 통화 허용은 꺼져 있으며 통화를 예약하지 않았습니다.</string>
  <string name="dot_entry">사이드바 항목 라벨 (선택 · 비우면 닷 이름 사용)</string>
+ <string name="inspect_entry">Dot 항목 진입만 테스트 (통화하지 않음)</string>
+ <string name="apply_fold_profile">관찰된 Fold7 한국어 라벨 적용 (통화 허용 꺼짐)</string>
 </resources>

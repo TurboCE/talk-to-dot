@@ -7,7 +7,8 @@ import java.util.List;
 final class MenuInspector {
     static final String MENU="메뉴", CALL="통화", COMPOSER="내 dot에게 메시지 보내기", END="종료";
     static AccessibilityNodeInfo candidate(AccessibilityNodeInfo root) {
-        if(root==null || !ControlResolver.equal(root.getPackageName(),"com.openai.chatgpt"))return null;
+        if(root==null || !ControlResolver.equal(root.getPackageName(),"com.openai.chatgpt")
+                || NativeNavigation.drawerEvidence(root)!=NativeNavigation.NONE)return null;
         List<AccessibilityNodeInfo> menu=new ArrayList<>(),calls=new ArrayList<>();int[] inputs={0},ends={0};
         walk(root,menu,calls,inputs,ends);
         return menu.size()==1 && calls.size()==1 && inputs[0]==1 && ends[0]==0 && !menu.get(0).equals(calls.get(0))?menu.get(0):null;
