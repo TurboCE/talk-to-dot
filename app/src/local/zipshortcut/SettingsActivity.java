@@ -10,6 +10,7 @@ public class SettingsActivity extends Activity {
     EditText[] fields=new EditText[CallSettings.KEYS.length];
     CheckBox consent;
     Spinner icons;
+    TextView inspection;
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
         ScrollView scroll=new ScrollView(this); scroll.setFitsSystemWindows(true);
@@ -19,6 +20,8 @@ public class SettingsActivity extends Activity {
         TextView help=new TextView(this); help.setText(R.string.setup_help); box.addView(help);
         int status=ResultStatus.message(getSharedPreferences("shortcut",0).getString("lastResult",""));
         if(status!=0) { TextView result=new TextView(this); result.setText(getString(R.string.last_result)+" "+getString(status)); box.addView(result); }
+        inspection=new TextView(this);inspection.setContentDescription(getString(R.string.inspect_report));
+        inspection.setTextIsSelectable(true);box.addView(inspection);
         name=field(box,R.string.dot_name,DotSettings.name(this)); name.setId(99);
         int[] titles={R.string.composer,R.string.menu_label,R.string.sidebar_label,R.string.up_label,R.string.call_label,R.string.connected_label};
         for(int i=0;i<fields.length;i++) { fields[i]=field(box,titles[i],CallSettings.get(this,i)); fields[i].setId(100+i); }
@@ -31,10 +34,23 @@ public class SettingsActivity extends Activity {
         consent.setChecked(getSharedPreferences("shortcut",0).getBoolean("consent",false)); box.addView(consent);
         button(box,R.string.save,()->save());
         button(box,R.string.save_open,()-> {if(save() && consent.isChecked()) { startActivity(new Intent(this,LauncherActivity.class)); finish(); }});
+        button(box,R.string.inspect_controls,()-> {
+            if(ZipService.instance==null) {Toast.makeText(this,R.string.inspect_enable,Toast.LENGTH_LONG).show();return;}
+            Intent chat=getPackageManager().getLaunchIntentForPackage("com.openai.chatgpt");
+            if(chat==null) {Toast.makeText(this,R.string.missing_app,Toast.LENGTH_LONG).show();return;}
+            ZipService.instance.inspectOnce();startActivity(chat);
+        });
         button(box,R.string.access,()->startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)));
         button(box,R.string.cancel,()-> { if(ZipService.instance!=null)ZipService.instance.stop(ResultStatus.CANCELLED);
             else CallSettings.clearRequest(getSharedPreferences("shortcut",0).edit()).commit(); });
         scroll.addView(box); setContentView(scroll);
+    }
+    @Override protected void onResume() {
+        super.onResume();
+        if(inspection!=null) {
+            inspection.setText(ZipService.inspectionReport);
+            inspection.setVisibility(ZipService.inspectionReport.isEmpty()?android.view.View.GONE:android.view.View.VISIBLE);
+        }
     }
     EditText field(LinearLayout box,int label,String value) {
         TextView title=new TextView(this); title.setText(label); box.addView(title);

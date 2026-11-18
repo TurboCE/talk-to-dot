@@ -18,6 +18,9 @@ public class ZipService extends AccessibilityService {
     static final long TREE_GRACE_MS=1000;
     final Handler handler=new Handler(Looper.getMainLooper());
     final Runnable tick=this::step;
+    final Runnable inspectTick=this::inspectStep;
+    static String inspectionReport="";
+    long inspectionDeadline;
     boolean running, enteredTarget;
     CallPolicy policy;
     String targetName, lastAction="";
@@ -27,10 +30,28 @@ public class ZipService extends AccessibilityService {
     Rect candidateBounds;
     SharedPreferences prefs() { return getSharedPreferences("shortcut",0); }
     @Override protected void onServiceConnected() { instance=this; if(armed())begin(); }
-    @Override public void onDestroy() { if(running)stop(ResultStatus.CANCELLED); instance=null; super.onDestroy(); }
-    @Override public void onInterrupt() { if(running)stop(ResultStatus.CANCELLED); }
+    @Override public void onDestroy() { handler.removeCallbacks(inspectTick); inspectionDeadline=0; if(running)stop(ResultStatus.CANCELLED); instance=null; super.onDestroy(); }
+    @Override public void onInterrupt() { handler.removeCallbacks(inspectTick); inspectionDeadline=0; if(running)stop(ResultStatus.CANCELLED); }
     @Override public void onAccessibilityEvent(AccessibilityEvent event) {
         if(!running && armed())begin(); else if(running)schedule(0);
+    }
+    void inspectOnce() {
+        if(running)stop(ResultStatus.CANCELLED);
+        CallSettings.clearRequest(prefs().edit()).commit();
+        inspectionReport="";inspectionDeadline=SystemClock.elapsedRealtime()+10000;
+        handler.removeCallbacks(inspectTick);handler.postDelayed(inspectTick,0);
+    }
+    void inspectStep() {
+        if(inspectionDeadline==0)return;
+        if(SystemClock.elapsedRealtime()>=inspectionDeadline) {
+            inspectionDeadline=0;Toast.makeText(this,R.string.inspect_timeout,Toast.LENGTH_LONG).show();return;
+        }
+        AccessibilityNodeInfo root=getRootInActiveWindow();
+        if(current(root)) {
+            inspectionReport=ScreenInspector.scan(root);inspectionDeadline=0;
+            Toast.makeText(this,R.string.inspect_done,Toast.LENGTH_LONG).show();return;
+        }
+        handler.postDelayed(inspectTick,150);
     }
     boolean armed() {
         long start=prefs().getLong("startedAtElapsed",-1), now=SystemClock.elapsedRealtime();
@@ -171,13 +192,13 @@ public class ZipService extends AccessibilityService {
     }
     void collectInputs(AccessibilityNodeInfo node,List<AccessibilityNodeInfo> inputs) {
         if(node==null || inputs.size()>1)return;
-        if(node.isVisibleToUser() && node.isEnabled() && node.isEditable() && matches(node,labels[0]))inputs.add(node);
+        if(ControlResolver.input(node,labels[0]))inputs.add(node);
         for(int i=0;i<node.getChildCount();i++)collectInputs(node.getChild(i),inputs);
     }
     boolean callLabel(AccessibilityNodeInfo node) {
-        return node.isVisibleToUser() && node.isEnabled() && node.isClickable() && !node.isEditable() && explicitLabel(node,labels[4]);
+        return ControlResolver.control(node,labels[4],true);
     }
-    AccessibilityNodeInfo callControl(AccessibilityNodeInfo root) { return directControl(root,labels[4],false); }
+    AccessibilityNodeInfo callControl(AccessibilityNodeInfo root) { return directControl(root,labels[4],true); }
     int stateCount(AccessibilityNodeInfo root,String label) {
         if(label.isEmpty())return 0;
         List<AccessibilityNodeInfo> found=new ArrayList<>();collectControls(root,label,true,found);
@@ -196,11 +217,7 @@ public class ZipService extends AccessibilityService {
     }
     void collectControls(AccessibilityNodeInfo node,String label,boolean buttonRole,List<AccessibilityNodeInfo> found) {
         if(node==null || found.size()>1)return;
-        CharSequence role=node.getClassName();
-        boolean button="android.widget.Button".contentEquals(role==null?"":role)
-                || "android.widget.ImageButton".contentEquals(role==null?"":role);
-        if(node.isVisibleToUser() && node.isEnabled() && node.isClickable() && !node.isEditable()
-                && (!buttonRole || button) && explicitLabel(node,label))found.add(node);
+        if(ControlResolver.control(node,label,buttonRole))found.add(node);
         for(int i=0;i<node.getChildCount();i++)collectControls(node.getChild(i),label,buttonRole,found);
     }
     AccessibilityNodeInfo unique(AccessibilityNodeInfo root,String label,boolean clickable) {

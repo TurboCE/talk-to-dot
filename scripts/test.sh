@@ -30,6 +30,7 @@ names=[n.get('name') for n in ET.parse('app/res/values/strings.xml').getroot() i
 p=Path('build/test-generated/local/zipshortcut');p.mkdir(parents=True,exist_ok=True)
 (p/'R.java').write_text('package local.zipshortcut; public final class R {public static class string {'+''.join('public static final int '+n+'='+str(i+1)+';' for i,n in enumerate(names))+'}}')
 PYGEN
-javac -d build/tests $(find tests/stubs -name '*.java') build/test-generated/local/zipshortcut/R.java app/src/local/zipshortcut/{ZipService,CallPolicy,CallSettings,DotSettings,ResultStatus}.java tests/local/zipshortcut/{ZipServiceTest,ReviewRegressionTest}.java
+javac -d build/tests $(find tests/stubs -name '*.java') build/test-generated/local/zipshortcut/R.java app/src/local/zipshortcut/{ZipService,CallPolicy,CallSettings,DotSettings,ResultStatus,ControlResolver,ScreenInspector}.java tests/local/zipshortcut/{ZipServiceTest,ReviewRegressionTest,FoldControlResolverTest}.java
 java -cp build/tests local.zipshortcut.ZipServiceTest
 java -cp build/tests local.zipshortcut.ReviewRegressionTest
+java -cp build/tests local.zipshortcut.FoldControlResolverTest

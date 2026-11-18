@@ -1,4 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="local.zipshortcut" android:versionCode="8" android:versionName="1.4.1-dev">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="local.zipshortcut" android:versionCode="9" android:versionName="1.4.2-dev">
  <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="36" />
  <queries><package android:name="com.openai.chatgpt" /></queries>
  <application android:label="Talk to Dot" android:icon="@drawable/icon_frog" android:theme="@android:style/Theme.Material.Light.NoActionBar" android:allowBackup="false">
