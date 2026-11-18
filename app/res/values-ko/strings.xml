@@ -30,4 +30,5 @@
  <string name="click_failed">전화 버튼 누르기에 실패했습니다. 재시도하지 않습니다. ChatGPT에서 확인하세요.</string>
  <string-array name="icons"><item>개구리</item><item>고양이</item><item>여우</item><item>곰</item><item>올빼미</item><item>기본 D</item></string-array>
  <string name="consent_revoked">통화 실행 허용을 해제하고 진행 중인 자동화를 취소했습니다. 이미 시작한 통화는 종료하지 않습니다.</string>
+ <string name="ambiguous_state">사이드바 또는 통화 화면 표시가 여러 개라 자동화를 중지했습니다. 추가로 누르지 않습니다. ChatGPT와 진행 중인 통화를 직접 확인하세요.</string>
 </resources>

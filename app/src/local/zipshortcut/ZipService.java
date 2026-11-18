@@ -86,9 +86,10 @@ public class ZipService extends AccessibilityService {
             enteredTarget=true;
         }
         boolean composer=destination(root)!=null;
-        // State evidence is a unique directly actionable button, never arbitrary transcript text/hints.
-        boolean marker=stateControl(root,labels[5])!=null;
-        boolean sidebar=stateControl(root,labels[2])!=null;
+        // Preserve absent / unique / ambiguous states; duplicate controls must never imply absence.
+        int markerCount=stateCount(root,labels[5]), sidebarCount=stateCount(root,labels[2]);
+        if(markerCount>1 || sidebarCount>1) { stop(ResultStatus.AMBIGUOUS); return; }
+        boolean marker=markerCount==1, sidebar=sidebarCount==1;
         if(policy.attempted) {
             if(policy.confirmed(now,marker && !composer && !sidebar)) { stop(ResultStatus.CONFIRMED); return; }
             schedule(150); return;
@@ -102,12 +103,13 @@ public class ZipService extends AccessibilityService {
         }
         if(policy.ready(now,destination,call!=null,marker)) {
             AccessibilityNodeInfo checked=dispatchCandidate(call,bounds,candidateWindow);
-            if(checked==null) { resetEvidence(); schedule(150); return; }
+            if(checked==null) { if(running) { resetEvidence(); schedule(150); } return; }
             now=SystemClock.elapsedRealtime();
             if(policy.consume(now)) {
                 // Reserve synchronously, then revalidate after potentially blocking disk persistence.
                 if(!prefs().edit().putBoolean("callAttempted",true).putLong("attemptedAt",now).commit()) { stop(ResultStatus.CANCELLED); return; }
                 checked=dispatchCandidate(checked,bounds,candidateWindow);
+                if(!running)return;
                 if(checked==null || policy.expired(SystemClock.elapsedRealtime())) { stop(ResultStatus.CANCELLED); return; }
                 if(!checked.performAction(AccessibilityNodeInfo.ACTION_CLICK)) { stop(ResultStatus.CLICK_FAILED); return; }
             }
@@ -120,11 +122,13 @@ public class ZipService extends AccessibilityService {
                 if(target.performAction(AccessibilityNodeInfo.ACTION_CLICK)) { lastAction=action; lastClick=now; }
             }
         }
-        schedule(150);
+        if(running)schedule(150);
     }
     boolean navigationAllowed(AccessibilityNodeInfo previous,AccessibilityNodeInfo target) {
         AccessibilityNodeInfo active=getRootInActiveWindow();
-        return !policy.expired(SystemClock.elapsedRealtime()) && !locked() && current(active)
+        if(!current(active))return false;
+        if(ambiguousState(active)) { stop(ResultStatus.AMBIGUOUS); return false; }
+        return !policy.expired(SystemClock.elapsedRealtime()) && !locked()
                 && active.getWindowId()==previous.getWindowId() && target.refresh() && chatGpt(target)
                 && target.getWindowId()==active.getWindowId() && target.isVisibleToUser()
                 && target.isEnabled() && target.isClickable();
@@ -137,7 +141,7 @@ public class ZipService extends AccessibilityService {
         if(expected==null || locked() || !prefs().getBoolean("consent",false))return null;
         AccessibilityNodeInfo root=getRootInActiveWindow();
         if(!current(root) || root.getWindowId()!=window || destination(root)==null
-                || stateControl(root,labels[2])!=null || stateControl(root,labels[5])!=null)return null;
+                || !statesClearForCall(root))return null;
         AccessibilityNodeInfo call=callControl(root);
         if(call==null || !call.equals(expected) || !call.refresh())return null;
         Rect refreshedBounds=new Rect();call.getBoundsInScreen(refreshedBounds);
@@ -145,7 +149,7 @@ public class ZipService extends AccessibilityService {
         if(!callLabel(call) || !chatGpt(call) || call.getWindowId()!=window || !bounds.equals(refreshedBounds))return null;
         AccessibilityNodeInfo active=getRootInActiveWindow();
         if(!current(active) || active.getWindowId()!=window || destination(active)==null
-                || stateControl(active,labels[2])!=null || stateControl(active,labels[5])!=null)return null;
+                || !statesClearForCall(active))return null;
         AccessibilityNodeInfo finalCall=callControl(active);
         if(finalCall==null || !finalCall.equals(call) || !callLabel(finalCall) || !chatGpt(finalCall)
                 || finalCall.getWindowId()!=window || locked())return null;
@@ -174,7 +178,17 @@ public class ZipService extends AccessibilityService {
         return node.isVisibleToUser() && node.isEnabled() && node.isClickable() && !node.isEditable() && explicitLabel(node,labels[4]);
     }
     AccessibilityNodeInfo callControl(AccessibilityNodeInfo root) { return directControl(root,labels[4],false); }
-    AccessibilityNodeInfo stateControl(AccessibilityNodeInfo root,String label) { return directControl(root,label,true); }
+    int stateCount(AccessibilityNodeInfo root,String label) {
+        if(label.isEmpty())return 0;
+        List<AccessibilityNodeInfo> found=new ArrayList<>();collectControls(root,label,true,found);
+        return found.size(); // Saturated at two: absent, unique, or ambiguous.
+    }
+    boolean ambiguousState(AccessibilityNodeInfo root) { return stateCount(root,labels[2])>1 || stateCount(root,labels[5])>1; }
+    boolean statesClearForCall(AccessibilityNodeInfo root) {
+        int sidebar=stateCount(root,labels[2]), marker=stateCount(root,labels[5]);
+        if(sidebar>1 || marker>1) { stop(ResultStatus.AMBIGUOUS); return false; }
+        return sidebar==0 && marker==0;
+    }
     AccessibilityNodeInfo directControl(AccessibilityNodeInfo root,String label,boolean buttonRole) {
         if(label.isEmpty())return null;
         List<AccessibilityNodeInfo> found=new ArrayList<>();collectControls(root,label,buttonRole,found);

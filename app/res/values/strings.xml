@@ -30,4 +30,5 @@
  <string name="click_failed">Call click failed. No retry. Check ChatGPT manually.</string>
  <string-array name="icons"><item>Frog</item><item>Cat</item><item>Fox</item><item>Bear</item><item>Owl</item><item>Classic D</item></string-array>
  <string name="consent_revoked">Call authorization revoked. Pending automation cancelled; an existing call is not ended.</string>
+ <string name="ambiguous_state">Multiple sidebar or call-screen controls found. Automation stopped without another click. Check ChatGPT and any ongoing call manually.</string>
 </resources>

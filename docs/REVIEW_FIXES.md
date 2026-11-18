@@ -12,6 +12,12 @@ These changes are local only. The published `call-preview-1.4.0` / `8ecac1a` doe
 | Transcript text was interpreted as sidebar/call state | State evidence now requires one visible, enabled, directly clickable Button/ImageButton with explicit text/content-description, never a text/hint search. Editable destination matching is restricted to actual editable nodes before uniqueness checks. | Plain and clickable TextView transcript nodes containing sidebar/end-call labels are ignored. Real button markers still work. A transcript copy of the composer label does not suppress the real input. |
 | Generated resource IDs were persisted across APK versions | Persist a stable result name, map it to this version’s resource ID only when displaying it, ignore unknown names and legacy integer `lastStatus`, remove the old integer key when recording a new result. | Unknown/legacy values cannot be interpreted as resource IDs; known stable names resolve to this build’s resources. |
 
+## Additional review correction: ambiguous state markers
+
+State matching now preserves three outcomes: zero controls (absent), one (unique), and two or more (ambiguous). Duplicate sidebar or call-screen controls stop the session with a stable `ambiguous_state` result before any navigation/call action. Both initial observation and every call dispatch revalidation enforce this distinction, including after click reservation. Duplicate markers after a click stop observation without reporting success or issuing another action.
+
+Regression coverage includes duplicate `REAL_END` and `Scheduled` controls, zero call/menu/Dot clicks, markers introduced during both preflight reads and both post-reservation reads, and duplicates after an existing call attempt. Existing unique-marker and plain transcript tests remain in the full suite.
+
 ## Validation and limits
 
 - The full existing policy/service suite and new targeted review regressions pass. Exact check counts are recorded in the final task report; these are assertion counts, not device test cases.

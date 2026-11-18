@@ -44,6 +44,16 @@ public final class ReviewRegressionTest {
         BodyText(String text,boolean clickable){super(text);this.clickable=clickable;}
         @Override public CharSequence getClassName(){return "android.widget.TextView";}
     }
+    static ZipService duplicatesOnRead(String label,int trigger) {
+        android.content.SharedPreferences prefs=service().preferences;
+        ZipService service=new ZipService(){int reads;
+            @Override public AccessibilityNodeInfo getRootInActiveWindow() {
+                if(++reads==trigger)root.add(node(label,true)).add(node(label,true));
+                return root;
+            }};
+        service.preferences=prefs;service.root=node("root",false).add(composer()).add(node("REAL_CALL",true));
+        service.begin();return service;
+    }
     public static void main(String[] args) {
         // 1. Post-refresh changes never dispatch a click, including unchanged screen bounds.
         for(String change:new String[]{"label","package","window","disabled"}) {
@@ -108,11 +118,28 @@ public final class ReviewRegressionTest {
             }};
         switchedDuringNavigation.preferences=launchPrefs;AccessibilityNodeInfo menu=node("Menu",true);
         switchedDuringNavigation.root=node("root",false).add(menu);switchedDuringNavigation.begin();tick(switchedDuringNavigation,100);check(menu.clicks==0);
+        // 8. A duplicate state is ambiguous, never evidence that the state is absent.
+        for(String marker:new String[]{"REAL_END","Scheduled"}) {
+            s=service();call=node("REAL_CALL",true);dot=node("zip",true);menu=node("Menu",true);
+            s.root.add(composer()).add(call).add(dot).add(menu).add(node(marker,true)).add(node(marker,true));
+            check(s.stateCount(s.root,marker)==2);tick(s,100);tick(s,600);
+            check(call.clicks==0);check(dot.clicks==0);check(menu.clicks==0);check(!s.running);
+            check(s.preferences.getString("lastResult","").equals(ResultStatus.AMBIGUOUS));
+            // Markers appear only after the stable-button phase, during preflight / final read.
+            for(int read:new int[]{3,4,5,6}) {
+                s=duplicatesOnRead(marker,read);call=s.root.children.get(1);tick(s,100);tick(s,600);
+                check(call.clicks==0);check(!s.running);check(s.preferences.getString("lastResult","").equals(ResultStatus.AMBIGUOUS));
+            }
+            // After one call attempt, duplicate markers neither confirm nor trigger a second action.
+            s=service();call=node("REAL_CALL",true);s.root.add(composer()).add(call);tick(s,100);tick(s,600);check(call.clicks==1);
+            s.root=node("root",false).add(node(marker,true)).add(node(marker,true));tick(s,700);tick(s,1200);
+            check(call.clicks==1);check(!s.running);check(s.preferences.getString("lastResult","").equals(ResultStatus.AMBIGUOUS));
+        }
         // 7. Persistent outcomes are names. Legacy/unknown integer IDs are never dereferenced.
         s=service();s.preferences.edit().putInt("lastStatus",Integer.MAX_VALUE).apply();s.stop(ResultStatus.CANCELLED);
         check(s.preferences.getInt("lastStatus",0)==0);check(s.preferences.getString("lastResult","").equals("cancelled"));
         check(!ZipService.matches(node("anything",false),"null"));
         check(ResultStatus.message("cancelled")==R.string.cancelled);check(ResultStatus.message("future-version-code")==0);check(ResultStatus.message(null)==0);
-        System.out.println("PASS "+checks+" review regression checks (7 issues; synthetic Android, no device)");
+        System.out.println("PASS "+checks+" review regression checks (8 issues; synthetic Android, no device)");
     }
 }
