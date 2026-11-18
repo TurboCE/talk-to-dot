@@ -71,6 +71,16 @@ public final class NativeNavigationTest {
         s=service();s.labels[3]="상위 화면으로 이동";up=FoldControlResolverTest.control("상위 화면으로 이동",4);
         s.root=view().add(up).add(FoldControlResolverTest.control("상위 화면으로 이동",4));s.step();check(up.clicks==0);check(!s.policy.attempted);
         check(CallSettings.OBSERVED_FOLD_LABELS[3].equals("상위 화면으로 이동"));
+        // Hypothetical renamed provider input: Unicode substitution is exact, not fuzzy.
+        // This does not claim that changing the assistant nickname changes the real input label.
+        check(CallSettings.complete(CallSettings.OBSERVED_FOLD_LABELS,"리코","Dot"));
+        check(CallSettings.resolved(CallSettings.OBSERVED_FOLD_LABELS," 리코 ")[0].equals("내 리코에게 메시지 보내기"));
+        s=service();s.stop(ResultStatus.CANCELLED);check(CallSettings.store(s,"리코",CallSettings.OBSERVED_FOLD_LABELS,true,"Dot"));
+        s.preferences.edit().putLong("startedAtElapsed",100).putInt("boot",1).putString("requestProcess",CallSettings.PROCESS_ID).apply();
+        SystemClock.now=100;s.begin();check(s.targetName.equals("리코"));check(s.targetEntry.equals("Dot"));
+        call=FoldControlResolverTest.control("통화",4);s.root=view().add(FoldControlResolverTest.inputContainer("내 dot에게 메시지 보내기")).add(call);
+        s.step();SystemClock.now=600;s.step();check(call.clicks==0);
+        s.root=view().add(FoldControlResolverTest.inputContainer("내 리코에게 메시지 보내기")).add(call);SystemClock.now=700;s.step();check(call.clicks==0);SystemClock.now=1200;s.step();check(call.clicks==1);SystemClock.now=1300;s.step();check(call.clicks==1);
         System.out.println("PASS "+checks+" native drawer/entry-only checks (observed four-child shape; synthetic runtime)");
     }
 }

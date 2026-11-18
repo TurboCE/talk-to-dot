@@ -4,7 +4,7 @@ Published preview: **1.4.11-dev / versionCode 18**. Current installed candidate:
 
 ## Completed
 
-- 443 synthetic assertions: 27 policy, 31 service, 123 safety regression, 39 compact controls, 33 menu probe, 50 native navigation, 73 optional Bixby handoff and 67 actual-launcher checks. Manifest/privacy, locale parity and MIT checks pass.
+- 452 synthetic assertions: 27 policy, 31 service, 123 safety regression, 39 compact controls, 33 menu probe, 59 native navigation, 73 optional Bixby handoff and 67 actual-launcher checks. Manifest/privacy, locale parity and MIT checks pass.
 - Local JDK17/Android36 compilation, packaging, alignment and APK v2/v3 signing verification pass. Retained local signing identity permits data-preserving updates. No private key is published.
 - Identified Fold7 SM-F966N, Android17/API37, ChatGPT1.2026.314. Actual structural control discovery, menu and Dot-entry probes, authorization-OFF launch refusal, service recovery and removal of the optional floating shortcut were verified.
 - Announced app/routine trials reached the configured call screen and showed new microphone activity. The owner subsequently reported Bixby calling works. This is owner-reported spoken-command acceptance; no claim that every device/layout/lifecycle case was independently tested.
@@ -44,3 +44,5 @@ Non-call device lifecycle fixtures were prepared to use a non-matching call labe
 The owner reconfirmed actual spoken Bixby operation. Code19's 443 synthetic checks/build/signature verification passed and its own Advanced UI action passed after installation. The additional non-call lifecycle sequence did not run: guard setup aborted on the confirmed locked/Dozing SystemUI root before editing. Do not mark repeated-launch, departure, cold process or lock-refusal acceptance complete. A fresh unlock/short idle window is needed; no guard or new call was left active.
 
 Code19 [CI](https://github.com/TurboCE/talk-to-dot/actions/runs/44373981636) is green. Current hardware-reported state is CLOSED with no override, but the phone is locked/Dozing. The next device step needs a fresh unlock while keeping the current closed state; physical opening will be requested separately. No extra live call has been authorized or initiated in this window.
+
+The reported nickname **리코** has not been assumed to be a provider selector. Exact-Unicode synthetic tests pass, but the actual editable-input label must be read after unlock before deciding whether saved settings need changing. Google/Gemini package presence and the utility's public launcher were confirmed read-only; Hey Google invocation/overlay behavior remains untested and no generic dismissal was added.

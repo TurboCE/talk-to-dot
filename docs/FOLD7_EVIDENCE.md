@@ -109,3 +109,11 @@ The attempted guard setup later stopped before editing because Android's actual 
 The local rotation candidate was regenerated from code19 using the backup-restored keys and passed API26–32 and API33–37 signature verification. No production signer was installed or uploaded; current phone signing identity remains the retained development identity.
 
 Code19 [CI 44373981636](https://github.com/TurboCE/talk-to-dot/actions/runs/44373981636) passed at `5555abbf028fa8385befbd3467c7fcaed4c377fc`. A read-only Device State Manager check reported both base and committed state **0 / CLOSED**, lid closed, with no active override. This establishes the current hardware-reported closed state, not the state of every earlier trial. Current keyguard was showing with input restricted and power Dozing; no locked launch was attempted without the additional no-call guard.
+
+## Nickname change and Google entry preparation
+
+The owner reported changing the assistant name to **리코**. The stored automation name/entry was not overwritten on that report: a conversational nickname need not alter the provider's editable-input accessibility label. A host-only, no-click label probe was compiled using the actual structural resolver; it is ready for use after unlock. No real renamed-provider label or successful renamed-provider call is claimed yet.
+
+Nine additional synthetic checks verify exact Unicode substitution, independent native entry **Dot**, rejection of an old-name editable input and one stable call dispatch only for the hypothetical matching Korean input. These fixtures do not claim that the current provider renders that string. Total synthetic assertions: **452**.
+
+Read-only package metadata confirmed Google (`com.google.android.googlequicksearchbox`) and Gemini (`com.google.android.apps.bard`) are installed, and the utility's public launcher resolves to its retained MainActivity alias. No Google invocation/default setting/overlay dismissal or live call was attempted. The initial Back exception remains Bixby-only; Google's handoff is unverified.
