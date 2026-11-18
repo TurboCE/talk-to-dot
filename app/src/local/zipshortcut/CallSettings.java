@@ -39,6 +39,10 @@ final class CallSettings {
         return e.remove("startedAtElapsed").remove("armedUntil").remove("callAttempted")
                 .remove("attemptedAt").remove("observedTarget").remove("requestProcess");
     }
+    static boolean cancelRequest(Context c) {
+        return clearRequest(c.getSharedPreferences("shortcut",0).edit()).remove("lastStatus")
+                .putString("lastResult",ResultStatus.CANCELLED).commit();
+    }
     /** Revocation must succeed even when other fields are incomplete or invalid. */
     static boolean store(Context c,String name,String[] values,boolean consent) {
         return store(c,name,values,consent,"");

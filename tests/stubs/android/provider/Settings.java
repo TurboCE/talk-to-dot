@@ -1,1 +1,1 @@
-package android.provider; public class Settings { public static class Global {public static final String BOOT_COUNT="boot";public static int getInt(Object r,String s,int d){return 1;}}}
+package android.provider; public class Settings { public static class Secure {public static final String ENABLED_ACCESSIBILITY_SERVICES="enabled";public static String enabled="";public static String getString(Object r,String s){return enabled;}} public static class Global {public static final String BOOT_COUNT="boot";public static int getInt(Object r,String s,int d){return 1;}}}

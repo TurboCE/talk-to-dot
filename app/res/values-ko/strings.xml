@@ -1,7 +1,7 @@
 <resources>
  <string name="configure_dot">닷 통화 설정</string>
  <string name="service_description">직접 실행한 후 ChatGPT 안에서만 선택한 닷으로 이동하고 전화 버튼을 한 번만 누른 뒤 설정한 통화 화면 표시를 확인합니다. 30초 이내에 종료합니다. 화면 라벨을 읽지만 대화 저장, 녹음, 메시지 전송, 인터넷 사용은 하지 않습니다. 먼저 기기의 라벨을 확인하고 설정하세요.</string>
- <string name="setup_help">삼성 루틴에서 Voice to Dot 앱을 실행하면 설정한 Dot의 ChatGPT 음성 통화를 시작합니다. 먼저 잠금을 해제하세요. 접근성 서비스를 직접 켜고 정확한 버튼을 설정한 뒤 자동 통화를 허용하세요.\n\n접근성 권한으로 실행 후 최대 30초 동안 ChatGPT 화면을 읽고 조작합니다. 인터넷 권한·녹음·대화 기록·백업은 없으며 설정은 기기에만 저장됩니다. 허용 체크를 해제하고 저장하면 철회됩니다. 통화 화면 감지는 실제 음성 연결을 보장하지 않습니다.</string>
+ <string name="setup_help">삼성 루틴에서 Voice to Dot 앱을 실행하면 설정한 Dot의 ChatGPT 음성 통화를 시작합니다. 먼저 잠금을 해제하세요. 접근성 서비스를 직접 켜고 정확한 버튼을 설정한 뒤 자동 통화를 허용하세요.\n\n접근성 권한으로 실행 후 최대 30초 동안 ChatGPT 화면을 읽고 조작합니다. 인터넷 권한·녹음·대화 기록·백업은 없으며 설정은 기기에만 저장됩니다. 허용 체크를 해제하고 저장하면 철회됩니다. 통화 화면 감지는 실제 음성 연결을 보장하지 않습니다. 서비스 사용만 필요하며 떠 있는 접근성 바로가기는 꺼 두어도 됩니다.</string>
  <string name="dot_name">닷 이름 (정확히 입력)</string>
  <string name="composer">대상 입력창 라벨 ({dot} 포함 필수)</string>
  <string name="menu_label">메뉴의 정확한 라벨</string>
@@ -40,4 +40,6 @@
  <string name="inspect_entry">Dot 항목 진입만 테스트 (통화하지 않음)</string>
  <string name="apply_fold_profile">관찰된 Fold7 한국어 라벨 적용 (통화 허용 꺼짐)</string>
  <string name="advanced_settings">고급 설정 및 진단</string>
+ <string name="service_unavailable">접근성 서비스가 연결되지 않았습니다. Android 접근성 → 설치된 앱 → Voice to Dot에서 서비스를 껐다가 다시 켜세요. 떠 있는 바로가기는 꺼 두세요. 새 통화를 시도하지 않습니다.</string>
+ <string name="starting">통화를 시도 중입니다. 설정한 통화 화면을 기다립니다.</string>
 </resources>

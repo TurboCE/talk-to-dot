@@ -1,7 +1,7 @@
 <resources>
  <string name="configure_dot">Configure Dot call</string>
  <string name="service_description">After explicit launch, navigates only within ChatGPT and attempts one call-button click for your selected Dot, then checks a configured call-screen marker. Stops within 30 seconds. Reads screen labels, but does not store chat content, record audio, send messages, or use the internet. Configure and verify labels before enabling.</string>
- <string name="setup_help">Open Voice to Dot from a Samsung routine to start the configured Dot call in ChatGPT. Unlock the phone first. Enable this accessibility service manually, configure the exact controls, and authorize automatic calling.\n\nAccessibility can read and control ChatGPT screens for up to 30 seconds after launch. No internet permission, recording, chat logs, or backups. Settings remain on this device. Uncheck authorization and save to revoke it. Call-screen detection does not prove audible connection.</string>
+ <string name="setup_help">Open Voice to Dot from a Samsung routine to start the configured Dot call in ChatGPT. Unlock the phone first. Enable this accessibility service manually, configure the exact controls, and authorize automatic calling.\n\nAccessibility can read and control ChatGPT screens for up to 30 seconds after launch. No internet permission, recording, chat logs, or backups. Settings remain on this device. Uncheck authorization and save to revoke it. Call-screen detection does not prove audible connection. Only service access is needed; its floating accessibility shortcut can stay off.</string>
  <string name="dot_name">Exact Dot name</string>
  <string name="composer">Destination input label (must include {dot})</string>
  <string name="menu_label">Exact menu label</string>
@@ -40,4 +40,6 @@
  <string name="inspect_entry">Open verified Dot entry only (no call)</string>
  <string name="apply_fold_profile">Apply observed Fold7 Korean labels (calls OFF)</string>
  <string name="advanced_settings">Advanced setup and diagnostics</string>
+ <string name="service_unavailable">Accessibility service is disconnected. In Android Accessibility → Installed apps → Voice to Dot, turn the service off and back on. Leave its floating shortcut off. A new call will not be attempted.</string>
+ <string name="starting">Attempt in progress. Waiting for the configured call screen.</string>
 </resources>

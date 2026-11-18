@@ -9,7 +9,7 @@ public class SettingsActivity extends Activity {
     EditText name,entry;
     EditText[] fields=new EditText[CallSettings.KEYS.length];
     CheckBox consent;
-    TextView inspection,lastResult;
+    TextView inspection,lastResult,serviceWarning;
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
         ScrollView scroll=new ScrollView(this); scroll.setFitsSystemWindows(true);
@@ -24,6 +24,7 @@ public class SettingsActivity extends Activity {
             consent.setChecked(false);Toast.makeText(this,R.string.saved_disabled,Toast.LENGTH_LONG).show();
         });
         TextView help=new TextView(this); help.setText(R.string.setup_help); box.addView(help);
+        serviceWarning=new TextView(this);serviceWarning.setText(R.string.service_unavailable);box.addView(serviceWarning);
         lastResult=new TextView(this);box.addView(lastResult);
         inspection=new TextView(this);inspection.setContentDescription(getString(R.string.inspect_report));
         inspection.setTextIsSelectable(true);
@@ -59,16 +60,12 @@ public class SettingsActivity extends Activity {
         });
         button(box,R.string.access,()->startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)));
         button(box,R.string.cancel,()-> { if(ZipService.instance!=null)ZipService.instance.stop(ResultStatus.CANCELLED);
-            else CallSettings.clearRequest(getSharedPreferences("shortcut",0).edit()).commit(); });
+            else CallSettings.cancelRequest(this); refreshStatus(); });
         scroll.addView(box); setContentView(scroll);
     }
     @Override protected void onResume() {
         super.onResume();
-        if(lastResult!=null) {
-            int status=ResultStatus.message(getSharedPreferences("shortcut",0).getString("lastResult",""));
-            lastResult.setText(status==0?"":getString(R.string.last_result)+" "+getString(status));
-            lastResult.setVisibility(status==0?android.view.View.GONE:android.view.View.VISIBLE);
-        }
+        refreshStatus();
         if(inspection!=null) {
             inspection.setText(ZipService.inspectionReport);
             inspection.setVisibility(ZipService.inspectionReport.isEmpty()?android.view.View.GONE:android.view.View.VISIBLE);
@@ -76,6 +73,14 @@ public class SettingsActivity extends Activity {
                 inspection.setFocusableInTouchMode(true);inspection.requestFocus();
                 inspection.requestRectangleOnScreen(new android.graphics.Rect(0,0,inspection.getWidth(),inspection.getHeight()),false);
             });
+        }
+    }
+    void refreshStatus() {
+        if(serviceWarning!=null)serviceWarning.setVisibility(ZipService.instance==null?android.view.View.VISIBLE:android.view.View.GONE);
+        if(lastResult!=null) {
+            int status=ResultStatus.message(getSharedPreferences("shortcut",0).getString("lastResult",""));
+            lastResult.setText(status==0?"":getString(R.string.last_result)+" "+getString(status));
+            lastResult.setVisibility(status==0?android.view.View.GONE:android.view.View.VISIBLE);
         }
     }
     EditText field(LinearLayout box,int label,String value) {

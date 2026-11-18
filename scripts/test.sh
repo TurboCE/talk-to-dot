@@ -36,3 +36,7 @@ java -cp build/tests local.zipshortcut.ReviewRegressionTest
 java -cp build/tests local.zipshortcut.FoldControlResolverTest
 java -cp build/tests local.zipshortcut.MenuInspectorTest
 java -cp build/tests local.zipshortcut.NativeNavigationTest
+
+# Exercise actual launcher lifecycle/arming code separately from the setup UI.
+javac -classpath build/tests -d build/tests tests/launcher-stubs/local/zipshortcut/SettingsActivity.java app/src/local/zipshortcut/MainActivity.java tests/local/zipshortcut/LauncherRegressionTest.java
+java -cp build/tests local.zipshortcut.LauncherRegressionTest

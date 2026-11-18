@@ -1,11 +1,11 @@
 # Release readiness — Voice to Dots
 
-Current local source/build: **1.4.7-dev / versionCode 14**; device trial used **1.4.6-dev / versionCode 13**. The identified Samsung SM-F966N passed the non-call service probes with the unchanged core service in 1.4.5-dev; the later patch refreshes the stable outcome on setup resume. The final same-signature update succeeded and all eight prepared fields plus call authorization OFF were reverified. This remains an MIT fork of Talk to Dot; stable publication is blocked by the acceptance items below. The published 1.4.0 prerelease predates the safety fixes and is not the current build.
+Current local source/build: **1.4.8-dev / versionCode 15**; device trial used **1.4.6-dev / versionCode 13**. The identified Samsung SM-F966N passed the non-call service probes with the unchanged core service in 1.4.5-dev; the later patch refreshes the stable outcome on setup resume. The final same-signature update succeeded and all eight prepared fields plus call authorization OFF were reverified. This remains an MIT fork of Talk to Dot; stable publication is blocked by the acceptance items below. The published 1.4.0 prerelease predates the safety fixes and is not the current build.
 
 ## Completed
 
 - Safety corrections: refreshed label/identity/window/bounds validation; one-attempt reservation; restart cancellation; missing-tree grace; resolved-label collisions; authorization revocation; structural state evidence; stable result names; ambiguous-state cancellation.
-- **296 non-device assertions**: 27 call-policy, 31 baseline service, 123 safety regression, 39 compact-owner/inspection, 33 menu-only and 43 native drawer/entry checks. Manifest/privacy/locale/MIT checks pass. Every APK build now runs these gates before packaging, including the inherited CI build entrypoint.
+- **363 non-device assertions**: 27 call-policy, 31 baseline service, 123 safety regression, 39 compact-owner/inspection, 33 menu-only and 43 native drawer/entry and 67 actual-launcher checks. Manifest/privacy/locale/MIT checks pass. Every APK build now runs these gates before packaging, including the inherited CI build entrypoint.
 - Local JDK 17 / Android 36 / build tools 36.1.0 compilation, D8, packaging, alignment and APK v2/v3 signature verification pass. Runtime minimum API 26, target 36; device Android 17 / API 37, ChatGPT 1.2026.314.
 - Actual service recognizes normal-screen menu/call owners and paired input label. It opened the menu once and recognized the exact native four-child Dot row with unique Korean drawer anchors.
 - Actual entry-only service test dispatched exactly one action to that verified native Dot row and observed the normal Dot input/menu/call controls. It contains no call dispatch.
@@ -41,3 +41,9 @@ Only the observed Korean ChatGPT structure is established. English setup resourc
 ## Publication and device boundaries
 
 Only the review branch / draft PR is published. Main and APK releases remain unchanged. Private pairing codes, connection addresses and device serials are not needed in the public release evidence. Use the actual identified Fold7 transport for every device command; never operate on another attached phone. See FOLD7_EVIDENCE.md for the bounded observations and manual-vs-app distinction.
+
+## Interrupted Samsung routine trial
+
+A new manual routine named **Voice to Dot** was saved with exactly one action: Voice to Dot Open. Existing routines were not edited. No routine start was dispatched: initial connectivity failed, and the later pretrial checks found the service enabled but disconnected/in Android's Crashed services list. An old confirmed result was therefore not accepted as new success. The routine execution and voice-trigger acceptance gates remain open.
+
+The floating grey microphone was Android's Accessibility Button shortcut assigned to this utility, not a utility-created overlay or the system microphone privacy indicator. Only its Voice to Dot button assignment was unchecked; service access remained enabled. No other shortcut targets or apps were changed. A no-call service-readiness fix is in 1.4.8-dev; actual recovery still requires verifying the Android service connection, potentially an owner-operated service off/on.

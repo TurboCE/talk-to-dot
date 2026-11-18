@@ -1,6 +1,6 @@
 # Voice to Dot — TurboCE call preview
 
-**Development source: 1.4.7-dev; replacement APK not released.** The downloadable 1.4.0 preview does not contain the [review fixes](docs/REVIEW_FIXES.md).
+**Development source: 1.4.8-dev; replacement APK not released.** The downloadable 1.4.0 preview does not contain the [review fixes](docs/REVIEW_FIXES.md).
 
 MIT fork of [looizao/talk-to-dot](https://github.com/looizao/talk-to-dot), based on `6fbb5a3bde2fc2ee6a16b0a01a3138210c7b3c4c`. The original [MIT notice](LICENSE) remains. The app uses one neutral microphone icon. Independent project; not affiliated with OpenAI.
 
@@ -77,3 +77,5 @@ Run `./scripts/test.sh` separately when you only need the non-device tests.
 Outputs: `dist/talk-to-dot.apk` and `dist/SHA256SUMS.txt`. Default builds create/reuse `build/debug.keystore` (standard development credentials, not a production identity). Keep this local key if you want future development builds to update this APK. Keys are ignored by Git and never uploaded. A different key requires uninstall/reinstall. `RELEASE_BUILD=true` requires explicit `KEYSTORE_PATH`, `KEYSTORE_PASSWORD`, optionally `KEY_PASSWORD` and `KEY_ALIAS` (default `local`). Do not use the upstream release-signing secrets; this fork has its own identity.
 
 The test suite exercises the pure call policy and the actual service against deterministic synthetic Android nodes. It covers duplicate/disabled controls, wrong app, locked device, non-editable destination, call ancestor rejection, single attempts, restart, timeout, navigation and screen confirmation. These tests do **not** verify Android UI rendering, system Accessibility delivery, Fold7 behavior or audio. [Build evidence](docs/VALIDATION.md) records the prepared APK checks. Historical upstream docs are retained under `docs/` and [upstream README](docs/upstream-README.md); their installation/signing/device claims describe upstream, not this fork.
+
+If Android reports the service enabled but the app warns it is disconnected, turn the service off and back on in Accessibility → Installed apps → Voice to Dot. Leave the floating Accessibility Button shortcut off; it is not needed for routine launches. The app does not enable system permissions automatically.

@@ -25,3 +25,11 @@ Regression coverage includes duplicate `REAL_END` and `Scheduled` controls, zero
 - No physical device was accessed for these fixes. Actual Activity rendering, Android event delivery, process recovery and disk failures remain unverified. Test `Handler` and preferences remain deterministic fakes, not a real Android runtime.
 - State markers now deliberately require Button/ImageButton accessibility semantics. A real ChatGPT control may expose a different role or only label its child; without device evidence, the app will fail closed rather than infer a location or an unsupported role. Fold7 UI identifiers and actual audio/Bixby/Routines behavior still need owner-assisted device validation.
 - A re-created pre-click request is intentionally cancelled rather than resumed. After cancellation the user can explicitly launch a new request when the existing launch cooldown expires. Cancelling automation does not end an already started call.
+
+## Service readiness and stale outcomes (1.4.8-dev)
+
+On the Fold7, Android listed the utility as enabled but in Crashed services, with no bound service connection. No matching app Java exception remained in the available crash buffer. App-update process termination was observed, but the precise root cause is not established. An enabled setting alone is insufficient evidence of a working service.
+
+The actual launcher now refuses and clears a request if its service is disconnected, showing a recovery message instead of opening ChatGPT. New requests persist a starting result, preventing an older success from appearing to describe a new attempt. Launch failures and lock refusal persist distinct outcomes; cancellation now records cancelled even with no live service. Setup warns about the disconnected service and explicitly says the floating accessibility shortcut is unnecessary. No code enables permissions or creates a floating microphone.
+
+67 regression checks execute the actual MainActivity against deterministic Android fakes: disconnected-but-enabled, reconnect after refusal, exact component matching, absent permission, consent-off, lock, absent provider, progress state, cooldown, intent flags, dispatch exception, failed preference commit and service-free cancellation. These remain synthetic lifecycle tests, not Android service-binding or voice evidence.
