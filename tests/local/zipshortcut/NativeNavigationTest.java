@@ -17,6 +17,14 @@ public final class NativeNavigationTest {
     }
     static ZipService service(){return FoldControlResolverTest.service();}
     public static void main(String[] args){
+        AccessibilityNodeInfo up3=FoldControlResolverTest.view("",true).add(FoldControlResolverTest.labelBranch("상위 화면으로 이동",1)).add(emptyChain(4)).add(FoldControlResolverTest.buttonRole());
+        check(NativeNavigation.unique(view().add(up3),"상위 화면으로 이동")==up3);
+        check(!ControlResolver.control(up3,"상위 화면으로 이동",true));
+        check(NativeNavigation.unique(view().add(up3).add(up3),"상위 화면으로 이동")==null);
+        up3.getChild(1).getChild(0).label="unexpected";check(!NativeNavigation.conversationUp(up3,"상위 화면으로 이동"));
+        up3.getChild(1).getChild(0).label="";up3.getChild(2).clickable=true;check(!NativeNavigation.conversationUp(up3,"상위 화면으로 이동"));
+        up3.getChild(2).clickable=false;check(!NativeNavigation.conversationUp(up3,"통화"));
+        ZipService prior=service();prior.labels[3]="상위 화면으로 이동";prior.root=view().add(up3);prior.step();check(up3.clicks==1);check(!prior.policy.attempted);
         AccessibilityNodeInfo root=drawer(),dot=root.getChild(0);
         check(NativeNavigation.exactRow(dot,"Dot"));check(NativeNavigation.rowEvidence(dot,"Dot")==1);
         check(NativeNavigation.unique(root,"Dot").equals(dot));check(NativeNavigation.dotEntry(root).equals(dot));

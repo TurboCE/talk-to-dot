@@ -81,8 +81,17 @@ final class NativeNavigation {
         AccessibilityNodeInfo root=rootOf(owner);
         return exactRow(owner,label) && root!=null && drawerEvidence(root)==VERIFIED?VERIFIED:AMBIGUOUS;
     }
+    /** Existing conversation's Up control: exact labelled leaf, four empty icon Views, Button role. */
+    static boolean conversationUp(AccessibilityNodeInfo owner,String label) {
+        if(!"상위 화면으로 이동".equals(label) || !ControlResolver.usable(owner) || !ControlResolver.view(owner)
+                || !owner.isClickable() || owner.isEditable() || !empty(owner) || owner.getChildCount()!=3)return false;
+        AccessibilityNodeInfo branch=owner.getChild(0),role=owner.getChild(2);
+        return ControlResolver.labelBranch(branch,label,owner) && branch.getChildCount()==0
+                && decoration(owner.getChild(1),4,owner) && role!=null && ControlResolver.button(role)
+                && inert(role,owner) && empty(role) && role.getChildCount()==0;
+    }
     static int evidence(AccessibilityNodeInfo owner,String label) {
-        return ControlResolver.control(owner,label,true)?VERIFIED:rowEvidence(owner,label);
+        return ControlResolver.control(owner,label,true) || conversationUp(owner,label)?VERIFIED:rowEvidence(owner,label);
     }
     static final class Match {
         AccessibilityNodeInfo node;int count;boolean ambiguous;
