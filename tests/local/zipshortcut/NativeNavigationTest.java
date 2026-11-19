@@ -81,6 +81,17 @@ public final class NativeNavigationTest {
         call=FoldControlResolverTest.control("통화",4);s.root=view().add(FoldControlResolverTest.inputContainer("내 dot에게 메시지 보내기")).add(call);
         s.step();SystemClock.now=600;s.step();check(call.clicks==0);
         s.root=view().add(FoldControlResolverTest.inputContainer("내 리코에게 메시지 보내기")).add(call);SystemClock.now=700;s.step();check(call.clicks==0);SystemClock.now=1200;s.step();check(call.clicks==1);SystemClock.now=1300;s.step();check(call.clicks==1);
+        // Fold7 read-only observation after nickname change: the composer omits the old "내 " prefix.
+        String[] rico=CallSettings.OBSERVED_FOLD_LABELS.clone();rico[0]="{dot}에게 메시지 보내기";
+        check(CallSettings.complete(rico,"리코","Dot"));
+        s=service();s.stop(ResultStatus.CANCELLED);check(CallSettings.store(s,"리코",rico,true,"Dot"));
+        s.preferences.edit().putLong("startedAtElapsed",100).putInt("boot",1).putString("requestProcess",CallSettings.PROCESS_ID).apply();
+        SystemClock.now=100;s.begin();call=FoldControlResolverTest.control("통화",4);
+        s.root=view().add(FoldControlResolverTest.inputContainer("내 리코에게 메시지 보내기")).add(call);
+        s.step();SystemClock.now=600;s.step();check(call.clicks==0);
+        s.root=view().add(FoldControlResolverTest.inputContainer("리코에게 메시지 보내기")).add(call);
+        SystemClock.now=700;s.step();check(call.clicks==0);SystemClock.now=1200;s.step();check(call.clicks==1);
+        SystemClock.now=1300;s.step();check(call.clicks==1);
         System.out.println("PASS "+checks+" native drawer/entry-only checks (observed four-child shape; synthetic runtime)");
     }
 }
