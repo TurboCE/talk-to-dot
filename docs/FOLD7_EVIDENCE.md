@@ -123,3 +123,12 @@ Read-only package metadata confirmed Google (`com.google.android.googlequicksear
 The owner reported that both a routine named “리코 음성 대화” and direct utility launch reach Dot without starting voice; another invocation while the app remains present appears to do nothing. The actual provider labels, saved outcome and latest launch path cannot yet be checked because the identified Fold7 has no active ADB transport. No name/entry/call selector was changed based only on the report.
 
 Source inspection confirmed that the 30-second launch cooldown silently returned. Code20 preserves that duplicate-call prevention but displays a clear cooldown message, without overwriting the first attempt's outcome or rearming a call. Regression checks cover both feedback and preservation of the pending outcome. This addresses an identified silent-return path; it does not establish the cause of the owner's first-launch failure or prove every second invocation reached that branch. No new device call was started, code20 is not installed, and no release was published for this candidate.
+
+
+## Follow-up: renamed input, previous conversation and Korean launcher (codes20–22)
+
+A read-only probe observed the actual editable composer label `리코에게 메시지 보내기`, differing from saved `내 리코에게 메시지 보내기`. The own-app template was saved as `{dot}에게 메시지 보내기` and reloaded to verify persistence. This is per-device configuration, not an APK default migration.
+
+The owner then reported that Bixby opens an existing GPT conversation without reaching the drawer. The actual Up owner has three children: a labelled View leaf, four empty inert Views in a chain, and an inert Button role. Code21 accepts only this exact Korean Up shape in navigation; it does not relax call-control matching. Direct semantic Up probes succeeded through conversation/project screens; an immediate Menu probe did not establish drawer success. The owner subsequently performed the full Bixby flow and confirmed success.
+
+Code22 changes only the Korean app label to 닷 음성, retaining Voice to Dot as the default English label and all launcher component identities. Following the Gemini app-opening guidance and installation, the owner reported it works. Record both Bixby and Gemini as owner-reported end-to-end acceptance, not automated audio verification or universal launcher-name recognition. Total synthetic checks:468. The installed/published same-key APK remains 1.4.15-dev/versionCode22; no signing rotation or additional live agent call was performed.

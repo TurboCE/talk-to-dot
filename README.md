@@ -1,10 +1,10 @@
 # Voice to Dot — TurboCE call preview
 
-**Latest development APK: [1.4.11-dev preview](https://github.com/TurboCE/talk-to-dot/releases/tag/call-preview-1.4.11).** The downloadable 1.4.0 preview does not contain the [review fixes](docs/REVIEW_FIXES.md).
+**Latest Fold7-validated development APK: [1.4.15-dev preview](https://github.com/TurboCE/talk-to-dot/releases/tag/call-preview-1.4.15).** The downloadable 1.4.0 preview does not contain the [review fixes](docs/REVIEW_FIXES.md).
 
 MIT fork of [looizao/talk-to-dot](https://github.com/looizao/talk-to-dot), based on `6fbb5a3bde2fc2ee6a16b0a01a3138210c7b3c4c`. The original [MIT notice](LICENSE) remains. The app uses one neutral microphone icon. Independent project; not affiliated with OpenAI.
 
-This Android shortcut opens the **existing ChatGPT app**, navigates to the selected Dot, attempts **one actual call-button click**, and observes a configured call-screen marker. It uses neither TTS nor an API voice session. On the identified Fold7, actual Korean control structures and app/routine call-screen initiation were observed; the owner reported the Korean Bixby invocation works. The current build simplifies setup while preserving the call/handoff policies. This remains a **development preview**: both physical layouts, the equivalent English provider UI and remaining device lifecycle/safety acceptance are not all verified. See [device evidence](docs/FOLD7_EVIDENCE.md).
+This Android shortcut opens the **existing ChatGPT app**, navigates to the selected Dot, attempts **one actual call-button click**, and observes a configured call-screen marker. It uses neither TTS nor an API voice session. On the identified Fold7, actual Korean control structures and app/routine call-screen initiation were observed; the owner reported the Korean Bixby invocation works. The owner subsequently confirmed Bixby calling after the previous-conversation navigation fix, then reported success after the Korean launcher name became **닷 음성** for the Gemini app-opening trial. These are owner-reported end-to-end results, not automated audio verification. This remains a **development preview**: both physical layouts, the equivalent English provider UI and remaining device lifecycle/safety acceptance are not all verified. See [device evidence](docs/FOLD7_EVIDENCE.md).
 
 ## 설치 및 사용 / Install and use
 
