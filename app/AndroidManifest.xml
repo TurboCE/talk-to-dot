@@ -1,4 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="local.zipshortcut" android:versionCode="21" android:versionName="1.4.14-dev">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="local.zipshortcut" android:versionCode="22" android:versionName="1.4.15-dev">
  <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="36" />
  <queries><package android:name="com.openai.chatgpt" /></queries>
  <application android:label="@string/app_name" android:icon="@drawable/icon" android:theme="@android:style/Theme.Material.Light.NoActionBar" android:allowBackup="false">
