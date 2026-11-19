@@ -1,7 +1,7 @@
 <resources>
- <string name="configure_dot">Configure Dot call</string>
- <string name="service_description">After explicit launch, navigates only within ChatGPT and attempts one call-button click for your selected Dot, then checks a configured call-screen marker. Stops within 30 seconds. Reads screen labels, but does not store chat content, record audio, send messages, or use the internet. Configure and verify labels before enabling.</string>
- <string name="setup_help">This starts a real call in the existing ChatGPT app. No TTS or API. Accessibility can read and control screens. This app acts only in ChatGPT for up to 30 seconds after launch. No internet permission, chat logging, audio recording, or backups. Names and labels stay on this device.\n\nVerify exact accessibility text/content descriptions on your phone. English navigation defaults come from upstream and may not match your version. Call and call-screen labels are intentionally blank. No guessed labels or coordinates. Use a call-screen-only control such as the actual end-call control as confirmation; it is never clicked. This detects a screen, not audible connection.\n\nEnable this service manually in Android Accessibility. To change settings later, long-press the app icon and choose Configure Dot call, or open this service\'s settings. Unlock before launching from Bixby or a routine.</string>
+ <string name="configure_dot">Call settings</string>
+ <string name="service_description">After explicit launch, navigates only within ChatGPT and attempts one call-button click for your selected Dot, then checks a configured call-screen marker. Stops within 30 seconds. Reads screen labels, but does not store chat content, record audio, send messages, or use the internet. Configure and verify labels before enabling. If enabled in advanced setup, only the initial Bixby window can receive one Back action after explicit launch; other apps are never dismissed.</string>
+ <string name="setup_help">Unlock the phone, then run your Samsung routine to start a Dot call in ChatGPT. Accessibility service access is required.\n\nThe app reads ChatGPT screens and attempts one call within 30 seconds. The optional Bixby handoff sends Back once to its initial window. Settings stay on this device; no recording, chat logs, internet permission or backups. The floating shortcut is unnecessary.</string>
  <string name="dot_name">Exact Dot name</string>
  <string name="composer">Destination input label (must include {dot})</string>
  <string name="menu_label">Exact menu label</string>
@@ -9,15 +9,12 @@
  <string name="up_label">Exact navigate-up label (optional)</string>
  <string name="call_label">Exact call button label (verify on device)</string>
  <string name="connected_label">Exact call-screen-only marker (verify on device)</string>
- <string name="icon">Home screen icon</string>
- <string name="consent">I verified these labels and authorize a single real ChatGPT call attempt each time I launch this shortcut.</string>
+ <string name="consent">Allow one real call attempt when I launch the app or routine with these verified settings.</string>
  <string name="save">Save</string>
- <string name="save_open">Save and call Dot</string>
  <string name="access">Open Accessibility settings</string>
  <string name="cancel">Cancel pending attempt</string>
  <string name="last_result">Last result:</string>
  <string name="invalid">Enter a Dot name and distinct verified labels; destination must include {dot}. Confirm the call authorization.</string>
- <string name="icon_failed">Could not change launcher icon.</string>
  <string name="saved">Settings saved</string>
  <string name="locked">Unlock your phone and launch again.</string>
  <string name="missing_app">ChatGPT could not be opened. Install and sign in first.</string>
@@ -28,5 +25,18 @@
  <string name="confirmed">Configured call screen detected. Audio connection is not verified.</string>
  <string name="already_call">Call-screen marker already present. No call button clicked.</string>
  <string name="click_failed">Call click failed. No retry. Check ChatGPT manually.</string>
- <string-array name="icons"><item>Frog</item><item>Cat</item><item>Fox</item><item>Bear</item><item>Owl</item><item>Classic D</item></string-array>
+ <string name="consent_revoked">Call authorization revoked. Pending automation cancelled; an existing call is not ended.</string>
+ <string name="ambiguous_state">Multiple sidebar or call-screen controls found. Automation stopped without another click. Check ChatGPT and any ongoing call manually.</string>
+ <string name="inspect_done">Controls inspected without clicks. Return to setup to read the temporary report.</string>
+ <string name="inspect_timeout">Inspection timed out. No clicks or calls were made.</string>
+ <string name="inspect_menu_done">Navigation-only inspection finished. No call was dispatched. Return to setup for the temporary report.</string>
+ <string name="saved_disabled">Verified settings saved with call authorization OFF. No call was armed.</string>
+ <string name="dot_entry">Exact sidebar entry label (optional; defaults to Dot name)</string>
+ <string name="apply_fold_profile">Reset to observed Fold7 settings (calls OFF)</string>
+ <string name="advanced_settings">Advanced settings</string>
+ <string name="service_unavailable">Accessibility service is disconnected. In Android Accessibility → Installed apps → Voice to Dot, turn the service off and back on. Leave its floating shortcut off. A new call will not be attempted.</string>
+ <string name="starting">Attempt in progress. Waiting for the configured call screen.</string>
+ <string name="dismiss_bixby">Close Bixby once before entering ChatGPT (optional)</string>
+ <string name="app_name">Voice to Dot</string>
+ <string name="cooldown">A launch occurred less than 30 seconds ago. Duplicate call attempts are blocked. Check ChatGPT before trying again.</string>
 </resources>

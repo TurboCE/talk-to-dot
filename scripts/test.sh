@@ -30,5 +30,14 @@ names=[n.get('name') for n in ET.parse('app/res/values/strings.xml').getroot() i
 p=Path('build/test-generated/local/zipshortcut');p.mkdir(parents=True,exist_ok=True)
 (p/'R.java').write_text('package local.zipshortcut; public final class R {public static class string {'+''.join('public static final int '+n+'='+str(i+1)+';' for i,n in enumerate(names))+'}}')
 PYGEN
-javac -d build/tests $(find tests/stubs -name '*.java') build/test-generated/local/zipshortcut/R.java app/src/local/zipshortcut/{ZipService,CallPolicy,CallSettings,DotSettings}.java tests/local/zipshortcut/ZipServiceTest.java
+javac -d build/tests $(find tests/stubs -name '*.java') build/test-generated/local/zipshortcut/R.java app/src/local/zipshortcut/{ZipService,CallPolicy,CallSettings,DotSettings,ResultStatus,ControlResolver,ScreenInspector,MenuInspector,NativeNavigation,BixbyHandoff}.java tests/local/zipshortcut/{ZipServiceTest,ReviewRegressionTest,FoldControlResolverTest,MenuInspectorTest,NativeNavigationTest,BixbyHandoffTest}.java
 java -cp build/tests local.zipshortcut.ZipServiceTest
+java -cp build/tests local.zipshortcut.ReviewRegressionTest
+java -cp build/tests local.zipshortcut.FoldControlResolverTest
+java -cp build/tests local.zipshortcut.MenuInspectorTest
+java -cp build/tests local.zipshortcut.NativeNavigationTest
+java -cp build/tests local.zipshortcut.BixbyHandoffTest
+
+# Exercise actual launcher lifecycle/arming code separately from the setup UI.
+javac -classpath build/tests -d build/tests tests/launcher-stubs/local/zipshortcut/SettingsActivity.java app/src/local/zipshortcut/MainActivity.java tests/local/zipshortcut/LauncherRegressionTest.java
+java -cp build/tests local.zipshortcut.LauncherRegressionTest

@@ -12,11 +12,14 @@ BUILD_TOOLS_VERSION="${BUILD_TOOLS_VERSION:-36.1.0}"
 TOOLS="$SDK_ROOT/build-tools/$BUILD_TOOLS_VERSION"
 ANDROID_JAR="$SDK_ROOT/platforms/android-$SDK_PLATFORM/android.jar"
 if [[ -n "${JAVA_HOME:-}" ]]; then export PATH="$JAVA_HOME/bin:$PATH"; fi
-for tool in java javac jar keytool; do command -v "$tool" >/dev/null; done
+for tool in java javac jar keytool python3; do command -v "$tool" >/dev/null; done
 for tool in aapt d8 zipalign apksigner; do
   [[ -x "$TOOLS/$tool" ]] || { echo "Missing $TOOLS/$tool; install build-tools;$BUILD_TOOLS_VERSION" >&2; exit 1; }
 done
 [[ -f "$ANDROID_JAR" ]] || { echo "Missing $ANDROID_JAR; install platforms;android-$SDK_PLATFORM" >&2; exit 1; }
+
+# The same non-device regression/privacy gates run for local and CI APK builds.
+./scripts/test.sh
 
 rm -rf build/classes build/dex
 mkdir -p build/classes build/dex dist

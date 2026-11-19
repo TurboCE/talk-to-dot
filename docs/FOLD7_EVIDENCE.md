@@ -1,0 +1,134 @@
+# Release readiness — Voice to Dots
+
+Current source/build and installed device version: **1.4.6-dev / versionCode 13**. The identified Samsung SM-F966N passed the non-call service probes with the unchanged core service in 1.4.5-dev; the later patch refreshes the stable outcome on setup resume. The final same-signature update succeeded and all eight prepared fields plus call authorization OFF were reverified. This remains an MIT fork of Talk to Dot; stable publication is blocked by the acceptance items below. The published 1.4.0 prerelease predates the safety fixes and is not the current build.
+
+## Completed
+
+- Safety corrections: refreshed label/identity/window/bounds validation; one-attempt reservation; restart cancellation; missing-tree grace; resolved-label collisions; authorization revocation; structural state evidence; stable result names; ambiguous-state cancellation.
+- **296 non-device assertions**: 27 call-policy, 31 baseline service, 123 safety regression, 39 compact-owner/inspection, 33 menu-only and 43 native drawer/entry checks. Manifest/privacy/locale/MIT checks pass. Every APK build now runs these gates before packaging, including the inherited CI build entrypoint.
+- Local JDK 17 / Android 36 / build tools 36.1.0 compilation, D8, packaging, alignment and APK v2/v3 signature verification pass. Runtime minimum API 26, target 36; device Android 17 / API 37, ChatGPT 1.2026.314.
+- Actual service recognizes normal-screen menu/call owners and paired input label. It opened the menu once and recognized the exact native four-child Dot row with unique Korean drawer anchors.
+- Actual entry-only service test dispatched exactly one action to that verified native Dot row and observed the normal Dot input/menu/call controls. It contains no call dispatch.
+- All eight observed profile/entry/label fields were verified on the device; **call authorization remains OFF**. Same-signature updates preserved settings. No original app or data was removed and no device permission was enabled by the agent.
+- Earlier explicitly announced ADB call/start-end tests identified the active `종료` control and the owner reported audio. Those calls were **not** started by this app.
+
+## Saved observed profile
+
+| Field | Value |
+| --- | --- |
+| Profile name | `dot` |
+| Native entry label | `Dot` |
+| Dot input template | `내 {dot}에게 메시지 보내기` |
+| Menu | `메뉴` |
+| Native drawer marker | `Dot` |
+| Optional alternate/up control | empty |
+| Call | `통화` |
+| End-call screen marker | `종료` |
+
+Only the observed Korean ChatGPT structure is established. English setup resources exist; the equivalent current English provider layout is not claimed as verified. Native row acceptance requires its exact label/role structure, unique `새 채팅` / `검색` anchors and an inert optional indicator. Missing/duplicate or unrecognized evidence cannot permit a call.
+
+## Remaining stable-release gates
+
+1. **Announce and coordinate one app-originated live call.** Enable the app's own call authorization only for the coordinated test, invoke its launcher once and distinguish its Accessibility action from a direct ADB phone-button tap. Verify the app's stable result and owner-confirmed audio. End the test call with the owner; never schedule an unannounced retry.
+2. Verify natural startup/return/cold navigation, missing-label timeout, repeated invocation, app departure/interruption, authorization revocation and locked-device refusal. Synthetic tests remain the only evidence for scenarios the real provider cannot safely reproduce, such as duplicate controls.
+3. Establish physical folded/unfolded behavior with the owner. Display dimensions alone are not proof of state. Verify any persistent side-pane behavior before claiming both layouts work.
+4. Verify the exact Bixby/Routines launch-app action actually available on the device. Owner handles any system permission/settings changes. The utility does not unlock the phone.
+5. Verify CI for the final source revision. Both the [2105b5c build](https://github.com/TurboCE/talk-to-dot/actions/runs/44346450085) and the latest runtime-source [1e6a502 build](https://github.com/TurboCE/talk-to-dot/actions/runs/44347446027) passed. The logs show all six regression groups, privacy/resource checks, APK compilation and signature verification; no release job ran. Do not report queued or absent CI as passed. CI development keys may differ; do not install an unrelated CI-signed APK over the retained local key.
+6. Finalize and retain the release signing identity/backup and a data-preserving update plan. Do not silently uninstall the existing test app to change keys. Reverify final artifact integrity, privacy disclosures and version before stable publication.
+
+## Publication and device boundaries
+
+Only the review branch / draft PR is published. Main and APK releases remain unchanged. Private pairing codes, connection addresses and device serials are not needed in the public release evidence. Use the actual identified Fold7 transport for every device command; never operate on another attached phone. See FOLD7_EVIDENCE.md for the bounded observations and manual-vs-app distinction.
+
+## Final prepared runtime and CI
+
+The latest owner-provided pairing information was used only for the specified device; pairing and a real TLS connection succeeded, and the original model/serial identity matched. No private endpoint or pairing code is needed in this public record.
+
+The same-signature **1.4.6-dev / code 13** update succeeded without data clearing. Its only runtime change after the successful non-call probes refreshes the stable saved outcome whenever setup resumes. Device UI inspection again verified **8/8 prepared fields** and **call authorization OFF**. No live call was started in this preparation.
+
+Mandatory non-device regression gates now run for every APK build. The [latest runtime-source Linux CI](https://github.com/TurboCE/talk-to-dot/actions/runs/44347446027), revision `1e6a502`, succeeded, as did the prior service revision's run. Local macOS build/signature checks also pass. The current source remains a draft review branch; a real app-originated call, remaining device safety/layout/routine acceptance and release signing still gate stable publication.
+
+## Announced app-originated trial and simplified UI
+
+One selection of the utility’s Save-and-call action produced its stable configured-call-screen-confirmed result. No direct ADB ChatGPT phone-control click was used. The provider microphone app-op later showed about 47 seconds of completed use. Audio and who ended the call are not inferred from this record; owner feedback is pending. Automatic-call authorization was subsequently saved OFF without another launch.
+
+The retained-signature 1.4.7-dev / code14 update installed successfully with no uninstall or data reset. Actual setup rendering showed advanced edit fields and the icon chooser absent, authorization OFF, and the prior confirmed result. The app uses a neutral microphone icon and Voice to Dot label.
+
+An empty, unsaved Samsung Routines draft exposed: 루틴 만들기 → 이 루틴으로 실행할 동작 추가하기 → 애플리케이션 → 앱을 열거나 앱 동작 바로 실행. Searching Voice showed **Voice to Dot 열기**. The action was not selected or run; no routine was saved. This establishes availability, not successful Bixby voice-trigger execution.
+
+With authorization verified OFF, both the stable `LauncherActivity` and legacy `MainActivity` entry were invoked once. Each returned to own setup with authorization still OFF; the provider microphone app-op remained stopped with its prior completed duration unchanged. This verifies authorization-off routing on device. It does not test the authorized-launch cooldown, locked-device gate, cold provider startup, or interruption during a live attempt.
+
+## Service recovery and 1.4.8-dev (no call)
+
+The announced routine trial stopped before any routine Start action when preflight found no service connection despite the enabled setting. The available app crash buffer had no matching Java exception; Android update/process-termination logs were seen, without establishing the exact cause. The retained-signature code15 update installed successfully and preserved settings. Its disconnected-service warning was visible, and Cancel immediately replaced the old confirmed result with cancelled even without a connected service. Authorization was saved OFF.
+
+The owner explicitly asked the agent to perform the recovery. Only the utility's main service control was toggled off and on in Android Accessibility → Installed apps → Voice to Dot. Actual connection was then verified in the complete **multiline Bound services section**, not by the Enabled services list or a single-line match. The setup warning disappeared. The floating Accessibility Button assignment remained absent and authorization remained OFF. Last result showed cancelled. Provider microphone app-ops retained the old completed duration; no new call or routine Start occurred. Existing non-floating hardware shortcuts and other services were preserved.
+
+Runtime source 712da62 passed [CI 44356586143](https://github.com/TurboCE/talk-to-dot/actions/runs/44356586143); the local full suite passed 363 assertions and the APK v2/v3 signature checks. Samsung routine execution and audio feedback are still pending.
+
+## Single saved-routine attempt and work-conversation exit
+
+The agent selected **Voice to Dot 시작** exactly once in Samsung Routines, without directly launching the utility or clicking a ChatGPT call control. The pretrial app result was cancelled. ChatGPT became foreground; after 35 seconds the saved result was pre-call timeout, and the microphone record retained its previous completed duration. This is a failed full-flow trial, not successful voice initiation.
+
+A subsequent no-click service probe recognized a non-Dot work input and the actionable **상위 화면으로 이동** control. No work title/input identifier is included in public evidence. The observed optional Up setting was blank. A single structurally checked ADB action on that Up control returned to a screen with one **메뉴** control; it did not start a call. The 1.4.9-dev observed preset now includes the exact Korean Up label; synthetic regression checks pass. No further live call was attempted.
+
+The retained-signature 1.4.9-dev / code16 update subsequently installed successfully. Applying its observed preset cleared pending requests and saved call authorization OFF. The Up edit field was verified as **상위 화면으로 이동**, then advanced setup was collapsed. The service remained actually bound after this update and the floating shortcut was still absent. [Runtime CI 44358608124](https://github.com/TurboCE/talk-to-dot/actions/runs/44358608124) passed. The corrected full-flow live test has not run.
+
+## Corrected saved-routine trial (single announced start)
+
+With installed code16, actual service binding and a pretrial cancelled outcome were verified. The utility's own authorization was saved ON; then **Voice to Dot 시작** was selected exactly once in Samsung Routines. No direct utility-launch or ChatGPT phone-button ADB action was used.
+
+At about 19 seconds and again after 35 seconds, ChatGPT's microphone app-op showed a new running session. After the complete attempt deadline, the utility's saved result was **configured call screen detected**. This is successful routine-to-app call-screen initiation evidence; audible response remains owner-confirmed only. After reading the result, the agent returned to the existing ChatGPT call screen without clicking a phone control or starting another session. Owner feedback/termination is pending at the time of this record.
+
+## Korean name and optional Bixby handoff (code17, no live call)
+
+User Bixby invocation appeared in Routines → utility → provider activity records. Its response panel remained over Dot, with no new provider microphone use. Investigation operated only on the identified Fold7. The installed/public Bixby launcher and accessible root established its exact package.
+
+Only the created routine was renamed **닷 음성 실행**; its sole app-open action/manual trigger remained unchanged. A temporary UiAutomator jar performed ACTION_SET_TEXT on the exact routine-name EditText and verified the value, allowing Korean input without installing/changing keyboards. The jar was removed; no routine Start was selected.
+
+Retained-signature code17 installed successfully. Applying the observed profile kept calls OFF and enabled optional Bixby handoff. Explicit Bixby-only probes with calls OFF produced: keyboard-open timeout after one Back; then keyboard-hidden return to setup with **Bixby-only; Back attempts=1; Bixby no longer active; no call dispatch**. Provider microphone use remained unchanged. These isolated dismissal checks do not establish a spoken-command or live-call pass.
+
+## Owner acceptance and compact setup (code18)
+
+The owner reported Bixby invocation works after the code17 preparation. This is owner-reported acceptance; it is not independent verification of all layouts, cold startup or safety cases.
+
+Code18 is a UI cleanup: removed four diagnostic buttons/report and the immediate-call button, moved the observed-profile reset under advanced target settings, shortened both locale disclosures, and kept permission recovery, call authorization/revocation, last result, Save and cancellation. Core service/call/handoff logic and launcher component identities are unchanged. No new live call was requested for this update.
+
+The code18 update was confirmed after reconnecting: version18 was already installed, so it was not installed twice. Its installed base APK SHA256 matched the local candidate **1f67128baa72e9662581ea51f7aa14c12d71c0cb374c22e6f1dcbb2b4908c514**. Actual compact setup showed only Advanced settings, Save, Accessibility settings and cancellation, with no editable fields or diagnostic/immediate-call buttons visible. Authorization remained ON, the service remained bound and the floating shortcut remained absent. No new live call was started.
+
+[Source CI 44366689368](https://github.com/TurboCE/talk-to-dot/actions/runs/44366689368) passed at runtime commit **26ddb395cd4f0529d1a8a10d2e11252a0ce416b9**. The same APK, checksum and public signature metadata were published as [call-preview-1.4.11](https://github.com/TurboCE/talk-to-dot/releases/tag/call-preview-1.4.11). GitHub's uploaded APK digest matched the installed/local hash. This is a prerelease, not stable acceptance or a merge to main.
+
+## Follow-up non-call safety window and setup idleness (code19)
+
+The owner reconfirmed that an actual spoken Bixby command worked. This records owner-reported acceptance, not independent verification of every lifecycle/layout case.
+
+During preparation for additional non-call lifecycle tests, the host's own-settings selectors could not obtain a stable control. The setup updater was found to rewrite unchanged status text/visibility every 500ms; code19 skips those writes when values are unchanged. The full 443 synthetic checks, compilation and development-signature verification passed. The same-signature code19 update installed; an own-app semantic Advanced-button fixture then passed and exposed editable settings. No call policy or provider selector changed.
+
+The attempted guard setup later stopped before editing because Android's actual active root was SystemUI: keyguard showing=true, inputRestricted=true and wakefulness Dozing. No non-matching call label was applied or saved, no launcher/routine test was executed, and the temporary UI-test jar was removed. The original working call settings remain unchanged. This is **not** a completed repeat-launch, departure, process-restart or lock-refusal test. A fresh physical unlock is required before the prepared fixtures can run.
+
+The local rotation candidate was regenerated from code19 using the backup-restored keys and passed API26–32 and API33–37 signature verification. No production signer was installed or uploaded; current phone signing identity remains the retained development identity.
+
+Code19 [CI 44373981636](https://github.com/TurboCE/talk-to-dot/actions/runs/44373981636) passed at `5555abbf028fa8385befbd3467c7fcaed4c377fc`. A read-only Device State Manager check reported both base and committed state **0 / CLOSED**, lid closed, with no active override. This establishes the current hardware-reported closed state, not the state of every earlier trial. Current keyguard was showing with input restricted and power Dozing; no locked launch was attempted without the additional no-call guard.
+
+## Nickname change and Google entry preparation
+
+The owner reported changing the assistant name to **리코**. The stored automation name/entry was not overwritten on that report: a conversational nickname need not alter the provider's editable-input accessibility label. A host-only, no-click label probe was compiled using the actual structural resolver; it is ready for use after unlock. No real renamed-provider label or successful renamed-provider call is claimed yet.
+
+Nine additional synthetic checks verify exact Unicode substitution, independent native entry **Dot**, rejection of an old-name editable input and one stable call dispatch only for the hypothetical matching Korean input. These fixtures do not claim that the current provider renders that string. Total synthetic assertions: **452**.
+
+Read-only package metadata confirmed Google (`com.google.android.googlequicksearchbox`) and Gemini (`com.google.android.apps.bard`) are installed, and the utility's public launcher resolves to its retained MainActivity alias. No Google invocation/default setting/overlay dismissal or live call was attempted. The initial Back exception remains Bixby-only; Google's handoff is unverified.
+
+## New first-launch failure report and retry feedback (code20 candidate)
+
+The owner reported that both a routine named “리코 음성 대화” and direct utility launch reach Dot without starting voice; another invocation while the app remains present appears to do nothing. The actual provider labels, saved outcome and latest launch path cannot yet be checked because the identified Fold7 has no active ADB transport. No name/entry/call selector was changed based only on the report.
+
+Source inspection confirmed that the 30-second launch cooldown silently returned. Code20 preserves that duplicate-call prevention but displays a clear cooldown message, without overwriting the first attempt's outcome or rearming a call. Regression checks cover both feedback and preservation of the pending outcome. This addresses an identified silent-return path; it does not establish the cause of the owner's first-launch failure or prove every second invocation reached that branch. No new device call was started, code20 is not installed, and no release was published for this candidate.
+
+
+## Follow-up: renamed input, previous conversation and Korean launcher (codes20–22)
+
+A read-only probe observed the actual editable composer label `리코에게 메시지 보내기`, differing from saved `내 리코에게 메시지 보내기`. The own-app template was saved as `{dot}에게 메시지 보내기` and reloaded to verify persistence. This is per-device configuration, not an APK default migration.
+
+The owner then reported that Bixby opens an existing GPT conversation without reaching the drawer. The actual Up owner has three children: a labelled View leaf, four empty inert Views in a chain, and an inert Button role. Code21 accepts only this exact Korean Up shape in navigation; it does not relax call-control matching. Direct semantic Up probes succeeded through conversation/project screens; an immediate Menu probe did not establish drawer success. The owner subsequently performed the full Bixby flow and confirmed success.
+
+Code22 changes only the Korean app label to 닷 음성, retaining Voice to Dot as the default English label and all launcher component identities. Following the Gemini app-opening guidance and installation, the owner reported it works. Record both Bixby and Gemini as owner-reported end-to-end acceptance, not automated audio verification or universal launcher-name recognition. Total synthetic checks:468. The installed/published same-key APK remains 1.4.15-dev/versionCode22; no signing rotation or additional live agent call was performed.
