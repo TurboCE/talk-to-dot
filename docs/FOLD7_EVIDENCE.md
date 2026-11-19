@@ -117,3 +117,9 @@ The owner reported changing the assistant name to **리코**. The stored automat
 Nine additional synthetic checks verify exact Unicode substitution, independent native entry **Dot**, rejection of an old-name editable input and one stable call dispatch only for the hypothetical matching Korean input. These fixtures do not claim that the current provider renders that string. Total synthetic assertions: **452**.
 
 Read-only package metadata confirmed Google (`com.google.android.googlequicksearchbox`) and Gemini (`com.google.android.apps.bard`) are installed, and the utility's public launcher resolves to its retained MainActivity alias. No Google invocation/default setting/overlay dismissal or live call was attempted. The initial Back exception remains Bixby-only; Google's handoff is unverified.
+
+## New first-launch failure report and retry feedback (code20 candidate)
+
+The owner reported that both a routine named “리코 음성 대화” and direct utility launch reach Dot without starting voice; another invocation while the app remains present appears to do nothing. The actual provider labels, saved outcome and latest launch path cannot yet be checked because the identified Fold7 has no active ADB transport. No name/entry/call selector was changed based only on the report.
+
+Source inspection confirmed that the 30-second launch cooldown silently returned. Code20 preserves that duplicate-call prevention but displays a clear cooldown message, without overwriting the first attempt's outcome or rearming a call. Regression checks cover both feedback and preservation of the pending outcome. This addresses an identified silent-return path; it does not establish the cause of the owner's first-launch failure or prove every second invocation reached that branch. No new device call was started, code20 is not installed, and no release was published for this candidate.

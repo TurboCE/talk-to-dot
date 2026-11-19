@@ -38,4 +38,5 @@
  <string name="starting">통화를 시도 중입니다. 설정한 통화 화면을 기다립니다.</string>
  <string name="dismiss_bixby">ChatGPT 진입 전 빅스비 창을 한 번 닫기 (선택)</string>
  <string name="app_name">Voice to Dot</string>
+ <string name="cooldown">최근 실행 후 30초 이내라 중복 통화를 막았습니다. 먼저 ChatGPT의 통화 상태를 확인하세요.</string>
 </resources>

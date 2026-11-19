@@ -38,4 +38,5 @@
  <string name="starting">Attempt in progress. Waiting for the configured call screen.</string>
  <string name="dismiss_bixby">Close Bixby once before entering ChatGPT (optional)</string>
  <string name="app_name">Voice to Dot</string>
+ <string name="cooldown">A launch occurred less than 30 seconds ago. Duplicate call attempts are blocked. Check ChatGPT before trying again.</string>
 </resources>
